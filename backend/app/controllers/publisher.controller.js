@@ -63,6 +63,9 @@ exports.findOne = async (req, res, next) => {
 };
 
 exports.update = async (req, res, next) => {
+  if (Object.keys(req.body).length === 0) {
+    return next(new ApiError(400, "Dữ liệu để cập nhật không được để trống"));
+  }
   try {
     const publisherService = new PublisherService(MongoDB.client);
     const document = await publisherService.update(req.params.id, req.body);
@@ -111,4 +114,3 @@ exports.deleteAll = async (req, res, next) => {
     );
   }
 };
-

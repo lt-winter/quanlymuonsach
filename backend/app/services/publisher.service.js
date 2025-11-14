@@ -57,14 +57,14 @@ class PublisherService {
       { $set: update },
       { returnDocument: "after" },
     );
-    return result.value;
+    return result;
   }
 
   async delete(id) {
     const result = await this.NhaXuatBan.findOneAndDelete({
       _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
     });
-    return result.value;
+    return result;
   }
 
   async deleteAll() {
@@ -72,3 +72,5 @@ class PublisherService {
     return result.deletedCount;
   }
 }
+
+module.exports = PublisherService;
