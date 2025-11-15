@@ -5,10 +5,39 @@
     </div>
 
     <div class="mt-3 col-md-8">
-      <h4>
-        Danh sách Nhà xuất bản
-        <i class="fas fa-address-book"></i>
-      </h4>
+      <div class="d-flex justify-content-between align-items-center">
+        <h4>
+          Danh sách Nhà xuất bản
+          <i class="fas fa-address-book"></i>
+        </h4>
+
+        <div class="d-flex align-items-center m-4">
+          <span class="fw-bold mx-4">Sắp xếp: </span>
+
+          <!-- Chọn danh mục sắp xếp -->
+          <select
+            v-model="sortBy"
+            class="form-select form-select-sm w-auto mx-4"
+          >
+            <option value="">Mặc định</option>
+            <option value="tenNXB">Tên</option>
+          </select>
+
+          <!-- Nút đổi thứ tự sắp xếp -->
+          <button
+            class="btn btn-outline-secondary btn-sm d-flex align-items-center"
+            @click="toggleOrder"
+          >
+            <i
+              :class="
+                order === 'asc'
+                  ? 'fas fa-sort-amount-up'
+                  : 'fas fa-sort-amount-down'
+              "
+            ></i>
+          </button>
+        </div>
+      </div>
       <PublisherList
         v-if="filteredPublishersCount > 0"
         :publishers="filteredPublishers"
@@ -68,6 +97,8 @@ export default {
       publishers: [],
       activeIndex: -1,
       searchText: "",
+      sortBy: "",
+      order: "asc",
     };
   },
   watch: {
@@ -75,6 +106,12 @@ export default {
     // Bỏ chọn phần tử đang được chọn trong danh sách.
     searchText() {
       this.activeIndex = -1;
+    },
+    sortBy() {
+      this.retrievePublishers();
+    },
+    order() {
+      this.retrievePublishers();
     },
   },
   computed: {
@@ -101,9 +138,16 @@ export default {
     },
   },
   methods: {
+    toggleOrder() {
+      this.order = this.order === "asc" ? "desc" : "asc";
+      this.retrievePublishers();
+    },
     async retrievePublishers() {
       try {
-        this.publishers = await PublisherService.getAll();
+        this.publishers = await PublisherService.getAll({
+          sortBy: this.sortBy,
+          order: this.order,
+        });
       } catch (error) {
         console.log(error);
       }

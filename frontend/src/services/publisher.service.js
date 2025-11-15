@@ -4,8 +4,8 @@ class PublisherService {
   constructor(baseUrl = "/api/publishers") {
     this.api = createApiClient(baseUrl);
   }
-  async getAll() {
-    return (await this.api.get("/")).data;
+  async getAll(params = {}) {
+    return (await this.api.get("/", { params })).data;
   }
   async create(data) {
     return (await this.api.post("/", data)).data;

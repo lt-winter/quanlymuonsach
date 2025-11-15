@@ -24,6 +24,7 @@ exports.create = async (req, res, next) => {
 };
 
 exports.findAll = async (req, res, next) => {
+  const { sortBy, order } = req.query;
   let documents = [];
   try {
     const publisherService = new PublisherService(MongoDB.client);
@@ -31,7 +32,10 @@ exports.findAll = async (req, res, next) => {
     if (name) {
       documents = await publisherService.findByName(name);
     } else {
-      documents = await publisherService.find({});
+      const sort = {};
+      if (!sortBy) sort["_id"] = order === "desc" ? -1 : 1;
+      else sort[sortBy] = order === "desc" ? -1 : 1;
+      documents = await publisherService.find({}, sort);
     }
   } catch (error) {
     return next(

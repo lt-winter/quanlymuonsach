@@ -26,8 +26,8 @@ class PublisherService {
     return { _id: result.insertedId, ...nhaXuatBan };
   }
 
-  async find(filter) {
-    const cursor = await this.NhaXuatBan.find(filter);
+  async find(filter, sort = {}) {
+    const cursor = await this.NhaXuatBan.find(filter).sort(sort);
     return await cursor.toArray();
   }
 
