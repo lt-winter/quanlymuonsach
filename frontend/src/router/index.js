@@ -10,6 +10,11 @@ const routes = [
   },
   ...readerRoutes,
   ...publisherRoutes,
+  {
+    path: "/:pathMatch(.*)*",
+    name: "notfound",
+    component: () => import("@/views/admin/NotFound.vue"),
+  },
 ];
 
 const router = createRouter({
