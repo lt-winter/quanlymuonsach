@@ -30,8 +30,8 @@ class ReaderService {
     return { _id: result.insertedId, ...docGia };
   }
 
-  async find(filter) {
-    const cursor = await this.DocGia.find(filter);
+  async find(filter, sort = {}) {
+    const cursor = await this.DocGia.find(filter).sort(sort);
     return await cursor.toArray();
   }
 

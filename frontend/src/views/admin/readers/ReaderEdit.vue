@@ -22,7 +22,7 @@
 </template>
 
 <script>
-import ReaderForm from "@/components/readers/ReaderForm.vue";
+import ReaderForm from "@/components/admin/readers/ReaderForm.vue";
 import ReaderService from "@/services/reader.service";
 
 export default {
@@ -95,3 +95,10 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.page {
+  max-width: 576px;
+  margin: auto;
+}
+</style>

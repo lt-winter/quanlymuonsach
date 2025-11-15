@@ -5,10 +5,40 @@
     </div>
 
     <div class="mt-3 col-md-8">
-      <h4>
-        Danh sách Độc giả
-        <i class="fas fa-address-book"></i>
-      </h4>
+      <div class="d-flex justify-content-between align-items-center">
+        <h4>
+          Danh sách Độc giả
+          <i class="fas fa-address-book"></i>
+        </h4>
+        <div class="d-flex align-items-center m-4">
+          <span class="fw-bold mx-4">Sắp xếp: </span>
+
+          <!-- Chọn danh mục sắp xếp -->
+          <select
+            v-model="sortBy"
+            class="form-select form-select-sm w-auto mx-4"
+          >
+            <option value="">Mặc định</option>
+            <option value="ten">Tên</option>
+            <option value="hoLot">Họ lót</option>
+          </select>
+
+          <!-- Nút đổi thứ tự sắp xếp -->
+          <button
+            class="btn btn-outline-secondary btn-sm d-flex align-items-center"
+            @click="toggleOrder"
+          >
+            <i
+              :class="
+                order === 'asc'
+                  ? 'fas fa-sort-amount-up'
+                  : 'fas fa-sort-amount-down'
+              "
+            ></i>
+          </button>
+        </div>
+      </div>
+
       <ReaderList
         v-if="filteredReadersCount > 0"
         :readers="filteredReaders"
@@ -27,6 +57,10 @@
         <button class="btn btn-sm btn-danger" @click="removeAllReaders">
           <i class="fas fa-trash"></i> Xóa tất cả
         </button>
+
+        <div>
+          <p>Tổng số độc giả: {{ filteredReadersCount }}</p>
+        </div>
       </div>
     </div>
     <div class="mt-3 col-md-4">
@@ -68,6 +102,8 @@ export default {
       readers: [],
       activeIndex: -1,
       searchText: "",
+      sortBy: "",
+      order: "asc",
     };
   },
   watch: {
@@ -75,6 +111,14 @@ export default {
     // Bỏ chọn phần tử đang được chọn trong danh sách.
     searchText() {
       this.activeIndex = -1;
+    },
+
+    sortBy() {
+      this.retrieveReaders();
+    },
+
+    order() {
+      this.retrieveReaders();
     },
   },
   computed: {
@@ -103,7 +147,10 @@ export default {
   methods: {
     async retrieveReaders() {
       try {
-        this.readers = await ReaderService.getAll();
+        this.readers = await ReaderService.getAll({
+          sortBy: this.sortBy,
+          order: this.order,
+        });
       } catch (error) {
         console.log(error);
       }
@@ -124,6 +171,10 @@ export default {
     },
     goToAddReader() {
       this.$router.push({ name: "readers.add" });
+    },
+    toggleOrder() {
+      this.order = this.order === "asc" ? "desc" : "asc";
+      this.refreshList();
     },
   },
   mounted() {
