@@ -7,12 +7,7 @@ export default {
 };
 </script>
 <template>
-  <div id="app">
-    <AppHeader />
-    <div class="container mt-3">
-      <router-view />
-    </div>
-  </div>
+  <router-view />
 </template>
 <style>
 .page {

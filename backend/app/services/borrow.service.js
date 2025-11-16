@@ -2,6 +2,23 @@ class BorrowService {
   constructor(client) {
     this.Borrow = client.db().collection("theodoimuonsach");
   }
+  extractBorrowData(payload) {
+    const borrow = {
+      maDocGia: payload.maDocGia,
+      maSach: payload.maSach,
+      maNhanVien: payload.maNhanVien,
+      ngayMuon: payload.ngayMuon,
+      ngayTraDuKien: payload.ngayTraDuKien,
+      ngayTraThucTe: payload.ngayTraThucTe,
+    };
+    return borrow;
+  }
+
+  // Lấy tất cả bản ghi mượn
+  async findAll() {
+    const cursor = await this.Borrow.find();
+    return await cursor.toArray();
+  }
 
   // Cho độc giả mượn sách
   async borrow(maDocGia, maSach, ngayMuon) {
@@ -11,8 +28,12 @@ class BorrowService {
       ngayMuon,
       ngayTra: null,
     };
-    const r = await this.Borrow.insertOne(data);
-    return { _id: r.insertedId, ...data };
+    const result = await this.Borrow.findOneAndUpdate(
+      data,
+      { $set: { ...data, ngayTao: new Date(), ngayCapNhat: new Date() } },
+      { returnDocument: "after", upsert: true },
+    );
+    return { _id: result.value._id, ...data };
   }
 
   // Trả sách

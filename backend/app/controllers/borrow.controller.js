@@ -2,6 +2,27 @@ const BorrowService = require("../services/borrow.service");
 const MongoDB = require("../utils/mongodb.util");
 const ApiError = require("../api-error");
 
+exports.findAll = async (req, res, next) => {
+  let documents = [];
+  try {
+    const borrowService = new BorrowService(MongoDB.client);
+    const { name, sortBy, order } = req.query;
+    if (name) {
+      documents = await borrowService.findByName(name);
+    } else {
+      const sort = {};
+      if (!sortBy) sort["_id"] = order === "desc" ? -1 : 1;
+      else sort[sortBy] = order === "desc" ? -1 : 1;
+      documents = await borrowService.findAll(sort);
+    }
+    return res.send(documents);
+  } catch (error) {
+    return next(
+      new ApiError(500, "Lỗi khi tìm bản ghi mượn sách: " + error.message),
+    );
+  }
+};
+
 exports.borrowBook = async (req, res, next) => {
   if (!req.body?.maDocGia || !req.body?.maSach || !req.body?.ngayMuon) {
     return next(new ApiError(400, "Thiếu thông tin mượn sách"));

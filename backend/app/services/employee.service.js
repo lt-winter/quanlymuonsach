@@ -12,20 +12,22 @@ class EmployeeService {
       chucVu: payload.chucVu,
       diaChi: payload.diaChi,
       soDienThoai: payload.soDienThoai,
+      tenNguoiDung: payload.tenNguoiDung,
+      vaiTro: payload.vaiTro || "admin",
     };
     Object.keys(data).forEach((k) => data[k] === undefined && delete data[k]);
     return data;
   }
 
   async create(payload) {
-    const data = this.extract(payload);
+    const data = this.extractEmployeeData(payload);
     data.password = await bcrypt.hash(payload.password, 10);
 
-    const result = await this.Employee.findOneAndUpdate(
-      data,
-      { $set: { ...data, ngayTao: new Date(), ngayCapNhat: new Date() } },
-      { returnDocument: "after", upsert: true },
-    );
+    data.ngayTao = new Date();
+    data.ngayCapNhat = new Date();
+
+    const result = await this.Employee.insertOne(data);
+
     return { _id: result.insertedId, ...data };
   }
 
@@ -41,28 +43,29 @@ class EmployeeService {
   }
 
   async update(id, payload) {
-    const filter = {
-      _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
-    };
+    const filter = { _id: ObjectId.isValid(id) ? new ObjectId(id) : null };
     const update = this.extractEmployeeData(payload);
+
     update.ngayCapNhat = new Date();
+
     const result = await this.Employee.findOneAndUpdate(
       filter,
       { $set: update },
       { returnDocument: "after" },
     );
-    return result;
+
+    return result.value;
   }
 
   async delete(id) {
-    const result = await this.Employee.findOneAndDelete({
+    return await this.Employee.findOneAndDelete({
       _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
     });
-    return result;
   }
 
   async login(username, password) {
-    const user = await this.Employee.findOne({ hoTenNv: username });
+    const user = await this.Employee.findOne({ username });
+
     if (!user) return null;
 
     const ok = await bcrypt.compare(password, user.password);
