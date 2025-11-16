@@ -20,7 +20,7 @@ class BookService {
     return (await this.api.put(`/${id}`, data)).data;
   }
   async delete(id) {
-    return (await this.api.delete(`/${id}`)).data;
+    return (await this.api.patch(`/${id}`)).data;
   }
 }
 export default new BookService();

@@ -48,11 +48,11 @@ export default {
           try {
             const pub = await PublisherService.get(book.maNXB);
             if (pub) {
-              book.nhaXuatBan = pub._id;
+              book.maNXB = pub._id;
             }
           } catch (err) {
             console.warn("Không tìm thấy nhà xuất bản:", err);
-            book.nhaXuatBan = "";
+            book.maNXB = "";
           }
         }
         this.book = book;

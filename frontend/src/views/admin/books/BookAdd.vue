@@ -27,7 +27,14 @@ export default {
   },
   data() {
     return {
-      book: {},
+      book: {
+        tenSach: "",
+        donGia: "",
+        soQuyen: "",
+        namXuatBan: "",
+        maNXB: "",
+        tacGia: "",
+      },
       message: "",
     };
   },

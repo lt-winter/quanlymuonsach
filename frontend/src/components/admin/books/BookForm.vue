@@ -15,12 +15,17 @@
     <!-- Đơn giá -->
     <div class="form-group">
       <label for="donGia">Đơn giá</label>
-      <Field
-        name="donGia"
-        type="number"
-        class="form-control"
-        v-model="bookLocal.donGia"
-      />
+      <Field name="donGia" v-slot="{ field }">
+        <input
+          type="text"
+          class="form-control"
+          :name="field.name"
+          :value="formattedDonGia"
+          @input="onDonGiaInput($event.target.value, field)"
+          @blur="field.onBlur"
+          :ref="field.ref"
+        />
+      </Field>
       <ErrorMessage name="donGia" class="error-feedback" />
     </div>
 
@@ -50,17 +55,21 @@
     </div>
 
     <!-- Nhà xuất bản -->
-    <div class="form-group position-relative">
-      <label for="nhaXuatBan">Nhà xuất bản</label>
+    <div
+      class="form-group position-relative"
+      @click.outside="showDropdown = false"
+    >
+      <label for="maNXB">Nhà xuất bản</label>
 
       <!-- Input gõ tìm -->
-      <Field name="nhaXuatBan" v-slot="{ field }">
+      <Field name="maNXB" v-slot="{ field }">
         <input
           type="text"
           class="form-control"
           placeholder="Tìm nhà xuất bản..."
           :value="publisherSearch"
           @focus="showDropdown = true"
+          @click.stop="showDropdown = true"
           @input="
             (e) => {
               publisherSearch = e.target.value;
@@ -79,10 +88,10 @@
             v-for="pub in filteredPublishers"
             :key="pub._id"
             class="list-group-item list-group-item-action"
-            :class="{ active: pub._id === bookLocal.nhaXuatBan }"
+            :class="{ active: pub._id === bookLocal.maNXB }"
             @click="
               () => {
-                bookLocal.nhaXuatBan = pub._id;
+                bookLocal.maNXB = pub._id;
                 field.onChange(pub._id); // cập nhật VeeValidate
                 publisherSearch = pub.tenNXB; // hiển thị tên NXB đã chọn
                 showDropdown = false; // đóng dropdown
@@ -102,7 +111,7 @@
         </div>
       </Field>
 
-      <ErrorMessage name="nhaXuatBan" class="error-feedback" />
+      <ErrorMessage name="maNXB" class="error-feedback" />
     </div>
 
     <div class="form-group">
@@ -150,19 +159,18 @@ export default {
 
   data() {
     const bookFormSchema = yup.object().shape({
-      tenSach: yup.string().required().min(2).max(100),
+      tenSach: yup.string().required("Tên sách là bắt buộc.").min(2).max(100),
       donGia: yup
         .number()
         .typeError("Đơn giá phải là số.")
-        .positive()
-        .required(),
+        .required("Đơn giá là bắt buộc."),
       soQuyen: yup.number().typeError("Số quyển phải là số.").min(1).required(),
       namXuatBan: yup
         .number()
         .typeError("Năm xuất bản không hợp lệ.")
         .min(1900)
         .max(new Date().getFullYear()),
-      nhaXuatBan: yup.string().required("Phải chọn nhà xuất bản."),
+      maNXB: yup.string().required("Phải chọn nhà xuất bản."),
     });
 
     return {
@@ -179,6 +187,18 @@ export default {
     book: {
       handler(newBook) {
         this.bookLocal = { ...newBook };
+        if (this.bookLocal.donGia) {
+          this.bookLocal.donGia = String(this.bookLocal.donGia);
+        }
+        // Đảm bảo VeeValidate biết giá trị donGia ban đầu (dạng số)
+        if (this.$refs.form?.setFieldValue) {
+          const val = this.bookLocal.donGia
+            ? Number(String(this.bookLocal.donGia).replace(/\./g, ""))
+            : undefined;
+          if (val !== undefined && !Number.isNaN(val)) {
+            this.$refs.form.setFieldValue("donGia", val);
+          }
+        }
         this.syncPublisherSearch();
       },
       deep: true,
@@ -198,9 +218,25 @@ export default {
         p.tenNXB.toLowerCase().includes(this.publisherSearch.toLowerCase())
       );
     },
+    formattedDonGia() {
+      if (!this.bookLocal.donGia) return "";
+      return this.bookLocal.donGia
+        .toString()
+        .replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    },
   },
 
   methods: {
+    onDonGiaInput(value, field) {
+      const raw = value.replace(/\./g, "");
+      const num = raw ? Number(raw) : "";
+
+      this.bookLocal.donGia = num;
+      // Use VeeValidate field API to update the field value
+      if (field && typeof field.onChange === "function") {
+        field.onChange(num);
+      }
+    },
     async fetchPublishers() {
       try {
         this.publishers = await PublisherService.getAll();
@@ -211,12 +247,10 @@ export default {
 
     // Đồng bộ hiển thị name NXB khi edit sách
     syncPublisherSearch() {
-      if (!this.bookLocal?.nhaXuatBan) return;
+      if (!this.bookLocal?.maNXB) return;
       if (!this.publishers.length) return;
 
-      const pub = this.publishers.find(
-        (p) => p._id === this.bookLocal.nhaXuatBan
-      );
+      const pub = this.publishers.find((p) => p._id === this.bookLocal.maNXB);
       if (!pub) return;
 
       // Hiển thị tên NXB vào input
@@ -224,7 +258,7 @@ export default {
 
       // Set vào vee-validate (nếu cần)
       if (this.$refs.form?.setFieldValue) {
-        this.$refs.form.setFieldValue("nhaXuatBan", pub._id);
+        this.$refs.form.setFieldValue("maNXB", pub._id);
       }
     },
 
