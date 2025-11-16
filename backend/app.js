@@ -1,7 +1,10 @@
 const express = require("express");
 const cors = require("cors");
+
 const readerRoutes = require("./app/routes/reader.route");
 const publisherRoutes = require("./app/routes/publisher.route");
+const bookRoutes = require("./app/routes/book.route");
+
 const ApiError = require("./app/api-error");
 
 const app = express();
@@ -15,6 +18,7 @@ app.get("/", (req, res) => {
 
 app.use("/api/readers", readerRoutes);
 app.use("/api/publishers", publisherRoutes);
+app.use("/api/books", bookRoutes);
 
 // handle 404 response
 app.use((req, res, next) => {

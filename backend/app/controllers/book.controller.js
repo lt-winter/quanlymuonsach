@@ -18,6 +18,7 @@ exports.create = async (req, res, next) => {
 };
 
 exports.findAll = async (req, res, next) => {
+  const { sortBy, order } = req.query;
   let documents = [];
   try {
     const bookService = new BookService(MongoDB.client);
@@ -25,7 +26,14 @@ exports.findAll = async (req, res, next) => {
     if (name) {
       documents = await bookService.findByName(name);
     } else {
-      documents = await bookService.find({});
+      const sort = {};
+      if (!sortBy) {
+        sort["_id"] = order === "desc" ? -1 : 1;
+      } else {
+        const sortOrder = order === "desc" ? -1 : 1;
+        sort[sortBy] = sortOrder;
+      }
+      documents = await bookService.find({}, sort);
     }
   } catch (error) {
     return next(
@@ -75,6 +83,20 @@ exports.delete = async (req, res, next) => {
   } catch (error) {
     return next(
       new ApiError(500, `Đã xảy ra lỗi khi xóa sách: ${error.message}`),
+    );
+  }
+};
+
+exports.deleteAll = async (req, res, next) => {
+  try {
+    const bookService = new BookService(MongoDB.client);
+    const deletedCount = await bookService.deleteAll();
+    return res.send({
+      message: `${deletedCount} sách đã được xóa thành công`,
+    });
+  } catch (error) {
+    return next(
+      new ApiError(500, `Đã xảy ra lỗi khi xóa tất cả sách: ${error.message}`),
     );
   }
 };

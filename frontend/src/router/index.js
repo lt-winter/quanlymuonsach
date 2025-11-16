@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import readerRoutes from "./reader.route";
 import publisherRoutes from "./publisher.route";
+import bookRoutes from "./book.route";
 
 const routes = [
   {
@@ -10,6 +11,7 @@ const routes = [
   },
   ...readerRoutes,
   ...publisherRoutes,
+  ...bookRoutes,
   {
     path: "/:pathMatch(.*)*",
     name: "notfound",

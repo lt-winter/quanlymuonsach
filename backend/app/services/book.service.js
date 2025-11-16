@@ -29,8 +29,8 @@ class BookService {
     return { _id: result.insertedId, ...sach };
   }
 
-  async find(filter) {
-    const cursor = await this.Sach.find(filter);
+  async find(filter, sort = {}) {
+    const cursor = await this.Sach.find(filter).sort(sort);
     return await cursor.toArray();
   }
 
