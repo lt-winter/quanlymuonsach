@@ -22,7 +22,7 @@
       </li>
 
       <li class="nav-item" v-if="user.role === 'superadmin'">
-        <router-link :to="{ name: 'readers' }" class="nav-link">
+        <router-link :to="{ name: 'employees' }" class="nav-link">
           Nhân viên
           <i class="fas fa-users-cog"></i>
         </router-link>

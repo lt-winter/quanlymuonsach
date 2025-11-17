@@ -6,6 +6,7 @@ import AuthLayout from "@/layouts/AuthLayout.vue";
 import readerRoutes from "./reader.route";
 import publisherRoutes from "./publisher.route";
 import bookRoutes from "./book.route";
+import employeeRoutes from "./employee.route";
 
 const routes = [
   // AUTH LAYOUT
@@ -29,6 +30,7 @@ const routes = [
       ...readerRoutes,
       ...publisherRoutes,
       ...bookRoutes,
+      ...employeeRoutes,
 
       // Trang mặc định khi vào /admin
       {

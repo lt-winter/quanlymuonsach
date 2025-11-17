@@ -32,9 +32,12 @@ class EmployeeService {
     return { _id: result.insertedId, ...data };
   }
 
-  async find(filter) {
-    const cursor = await this.Employee.find(filter);
-    return await cursor.toArray();
+  async find(filter = {}) {
+    const cursor = await this.Employee.find({
+      ...filter,
+      vaiTro: "admin",
+    });
+    return cursor.toArray();
   }
 
   async findById(id) {
