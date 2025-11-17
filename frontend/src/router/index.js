@@ -51,18 +51,18 @@ const router = createRouter({
   routes,
 });
 
-//  Route Guard (bảo vệ trang admin)
-// router.beforeEach((to, from, next) => {
-//   const user = JSON.parse(localStorage.getItem("user"));
+/* Route Guard (bảo vệ trang admin) */
+router.beforeEach((to, from, next) => {
+  const user = JSON.parse(localStorage.getItem("user"));
 
-//   // Nếu chưa login mà vào trang admin → redirect về login
-//   if (to.path.startsWith("/admin") && to.name !== "admin.login") {
-//     if (!user) {
-//       return next({ name: "admin.login" });
-//     }
-//   }
+  // Nếu chưa login mà vào trang admin → redirect về login
+  if (to.path.startsWith("/admin") && to.name !== "admin.login") {
+    if (!user) {
+      return next({ name: "admin.login" });
+    }
+  }
 
-//   next();
-// });
+  next();
+});
 
 export default router;

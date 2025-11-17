@@ -1,6 +1,7 @@
 const app = require("./app");
 const config = require("./app/config/index");
 const MongoDB = require("./app/utils/mongodb.util");
+require("dotenv").config();
 
 async function startServer() {
   try {

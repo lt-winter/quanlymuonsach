@@ -13,6 +13,7 @@ class EmployeeService {
       diaChi: payload.diaChi,
       soDienThoai: payload.soDienThoai,
       tenNguoiDung: payload.tenNguoiDung,
+      matKhau: payload.matKhau,
       vaiTro: payload.vaiTro || "admin",
     };
     Object.keys(data).forEach((k) => data[k] === undefined && delete data[k]);
@@ -21,7 +22,7 @@ class EmployeeService {
 
   async create(payload) {
     const data = this.extractEmployeeData(payload);
-    data.password = await bcrypt.hash(payload.password, 10);
+    data.matKhau = await bcrypt.hash(payload.matKhau, 10);
 
     data.ngayTao = new Date();
     data.ngayCapNhat = new Date();
@@ -63,13 +64,21 @@ class EmployeeService {
     });
   }
 
+  // Đăng nhập
   async login(username, password) {
-    const user = await this.Employee.findOne({ username });
+    const user = await this.Employee.findOne({
+      tenNguoiDung: username,
+    });
 
     if (!user) return null;
 
-    const ok = await bcrypt.compare(password, user.password);
-    return ok ? user : null;
+    const hash = user.matKhau;
+    if (!hash) return null;
+
+    const match = await bcrypt.compare(password, hash);
+    if (!match) return null;
+
+    return user;
   }
 }
 

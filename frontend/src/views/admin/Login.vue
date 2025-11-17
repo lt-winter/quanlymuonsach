@@ -1,77 +1,75 @@
 <template>
-  <div class="login-wrapper">
-    <h2>Đăng nhập hệ thống</h2>
+  <div>
+    <h3 class="text-center mb-4">Đăng nhập hệ thống</h3>
 
-    <form @submit.prevent="login">
+    <Form :validation-schema="schema" @submit="handleLogin">
       <div class="mb-3">
-        <label>Tên người dùng</label>
-        <input v-model="tenNguoiDung" class="form-control" required />
+        <label class="form-label">Username</label>
+        <Field name="username" class="form-control" />
+        <ErrorMessage name="username" class="text-danger small" />
       </div>
 
       <div class="mb-3">
         <label>Mật khẩu</label>
-        <input
-          v-model="password"
-          type="password"
-          class="form-control"
-          required
-        />
+        <Field name="password" type="password" class="form-control" />
+        <ErrorMessage name="password" class="text-danger small" />
       </div>
 
-      <button class="btn btn-primary w-100">Đăng nhập</button>
-    </form>
+      <button class="btn btn-primary w-100" :disabled="loading">
+        <span v-if="loading" class="spinner-border spinner-border-sm"></span>
+        Đăng nhập
+      </button>
+    </Form>
 
-    <p v-if="error" class="text-danger mt-2">{{ error }}</p>
+    <p class="text-danger text-center mt-2">{{ error }}</p>
   </div>
 </template>
 
 <script>
+import { Form, Field, ErrorMessage } from "vee-validate";
+import * as Yup from "yup";
+import EmployeeService from "@/services/employee.service";
+
 export default {
+  components: { Form, Field, ErrorMessage },
+
   data() {
     return {
-      username: "",
-      password: "",
+      loading: false,
       error: "",
+      schema: Yup.object({
+        username: Yup.string().required("Vui lòng nhập username"),
+        password: Yup.string().required("Vui lòng nhập mật khẩu"),
+      }),
     };
   },
+
   methods: {
-    async login() {
-      const res = await fetch("/api/nhanvien/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          username: this.username,
-          password: this.password,
-        }),
-      });
+    async handleLogin(values) {
+      this.loading = true;
+      this.error = "";
 
-      const data = await res.json();
+      try {
+        const res = await EmployeeService.login(values);
 
-      if (!data.user) {
-        this.error = "Sai tài khoản hoặc mật khẩu";
-        return;
-      }
+        if (!res || !res.user) {
+          this.error = res?.message || "Sai tài khoản hoặc mật khẩu";
+          return;
+        }
 
-      localStorage.setItem("user", JSON.stringify(data.user));
+        localStorage.setItem("user", JSON.stringify(res.user));
+        localStorage.setItem("token", res.token);
 
-      // điều hướng theo role
-      if (data.user.vaiTro === "superadmin") {
-        this.$router.push("/superadmin/dashboard");
-      } else {
-        this.$router.push("/admin/dashboard");
+        this.$router.push("/admin");
+      } catch (err) {
+        console.error("Login error:", err);
+        // axios error format
+        const serverMessage = err?.response?.data?.message || err?.message;
+        this.error = serverMessage || "Đã xảy ra lỗi khi đăng nhập";
+      } finally {
+        this.loading = false;
       }
     },
   },
 };
 </script>
-
-<style scoped>
-.login-wrapper {
-  max-width: 400px;
-  margin: 50px auto;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-</style>

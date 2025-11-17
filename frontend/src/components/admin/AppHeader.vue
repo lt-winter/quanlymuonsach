@@ -1,6 +1,6 @@
 <template>
   <nav class="navbar navbar-expand navbar-dark bg-dark sticky-top px-3">
-    <a href="/" class="navbar-brand">Quản lý Thư viện</a>
+    <a href="/admin" class="navbar-brand">Quản lý Thư viện</a>
     <ul class="mr-auto navbar-nav">
       <li class="nav-item">
         <router-link :to="{ name: 'readers' }" class="nav-link">
