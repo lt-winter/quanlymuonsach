@@ -22,8 +22,8 @@ exports.login = async (req, res, next) => {
     const token = jwt.sign(
       {
         id: user._id,
-        role: user.role,
         hoTenNv: user.hoTenNv,
+        role: user.vaiTro,
       },
       process.env.JWT_SECRET,
       { expiresIn: "1d" },
@@ -33,9 +33,9 @@ exports.login = async (req, res, next) => {
       message: "Đăng nhập thành công",
       user: {
         _id: user._id,
-        username: user.username,
-        hoTenNv: user.hoTenNv,
-        role: user.role,
+        username: user.tenNguoiDung,
+        fullName: user.hoTenNv,
+        role: user.vaiTro,
       },
       token,
     });

@@ -14,7 +14,7 @@ class EmployeeService {
       soDienThoai: payload.soDienThoai,
       tenNguoiDung: payload.tenNguoiDung,
       matKhau: payload.matKhau,
-      vaiTro: payload.vaiTro || "admin",
+      vaiTro: payload.vaiTro,
     };
     Object.keys(data).forEach((k) => data[k] === undefined && delete data[k]);
     return data;
