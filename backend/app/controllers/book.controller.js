@@ -1,6 +1,6 @@
-const BookService = require("../services/book.service");
-const MongoDB = require("../utils/mongodb.util");
-const ApiError = require("../api-error");
+const BookService = require("@/services/book.service");
+const MongoDB = require("@/utils/mongodb.util");
+const ApiError = require("@/api-error");
 
 exports.findAll = async (req, res, next) => {
   const { sortBy, order } = req.query;

@@ -1,10 +1,9 @@
 const express = require("express");
-const books = require("@/controllers/admin/book.controller");
+const books = require("@/controllers/book.controller");
 
 const router = express.Router();
 
-router.route("/").get(books.findAll).post(books.create).delete(books.deleteAll);
-
-router.route("/:id").get(books.findOne).put(books.update).patch(books.delete);
+router.route("/").get(books.findAll);
+router.route("/:id").get(books.findOne);
 
 module.exports = router;

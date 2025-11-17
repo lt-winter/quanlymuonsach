@@ -25,6 +25,12 @@ app.use(express.json());
 app.get("/", (req, res) => {
   res.send("Welcome to the Book Backend API!");
 });
+// routes
+app.use("/api/readers", readerRoutes);
+app.use("/api/publishers", publisherRoutes);
+app.use("/api/books", bookRoutes);
+app.use("/api/borrows", borrowRoutes);
+// app.use("/api/employees", employeeRoutes);
 
 app.use("/api/admin/readers", readerAdminRoutes);
 app.use("/api/admin/publishers", publisherAdminRoutes);

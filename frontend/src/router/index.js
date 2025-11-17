@@ -3,13 +3,30 @@ import { createRouter, createWebHistory } from "vue-router";
 import AdminLayout from "@/layouts/AdminLayout.vue";
 import AuthLayout from "@/layouts/AuthLayout.vue";
 
-import readerRoutes from "./reader.route";
-import publisherRoutes from "./publisher.route";
-import bookRoutes from "./book.route";
-import employeeRoutes from "./employee.route";
+import readerRoutes from "./admin/reader.route";
+import publisherRoutes from "./admin/publisher.route";
+import bookRoutes from "./admin/book.route";
+import employeeRoutes from "./admin/employee.route";
 
 const routes = [
+  // HOME PAGE
+  {
+    path: "/",
+    name: "home",
+    component: () => import("@/views/Homepage.vue"),
+  },
   // AUTH LAYOUT
+  {
+    path: "/login",
+    component: AuthLayout,
+    children: [
+      {
+        path: "",
+        name: "login",
+        component: () => import("@/views/Login.vue"),
+      },
+    ],
+  },
   {
     path: "/admin/login",
     component: AuthLayout,
