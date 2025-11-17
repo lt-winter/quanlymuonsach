@@ -4,7 +4,7 @@
 
     <Form :validation-schema="schema" @submit="handleLogin">
       <div class="mb-3">
-        <label class="form-label">Username</label>
+        <label class="form-label">Tên người dùng</label>
         <Field name="username" class="form-control" />
         <ErrorMessage name="username" class="text-danger small" />
       </div>
@@ -38,7 +38,7 @@ export default {
       loading: false,
       error: "",
       schema: Yup.object({
-        username: Yup.string().required("Vui lòng nhập username"),
+        username: Yup.string().required("Vui lòng nhập tên người dùng"),
         password: Yup.string().required("Vui lòng nhập mật khẩu"),
       }),
     };
@@ -53,7 +53,7 @@ export default {
         const res = await EmployeeService.login(values);
 
         if (!res || !res.user) {
-          this.error = res?.message || "Sai tài khoản hoặc mật khẩu";
+          this.error = res?.message || "Sai tên người dùng hoặc mật khẩu";
           return;
         }
 

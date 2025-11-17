@@ -28,9 +28,5 @@ export default {
       <strong>Tên người dùng:</strong>
       {{ employee.tenNguoiDung }}
     </div>
-    <div class="p-1">
-      <strong>Vai trò:</strong>
-      {{ employee.vaiTro }}
-    </div>
   </div>
 </template>

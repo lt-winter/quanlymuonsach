@@ -21,6 +21,8 @@
         </router-link>
       </li>
 
+      <li class="nav-item" v-if="user.role === 'superadmin'">|</li>
+
       <li class="nav-item" v-if="user.role === 'superadmin'">
         <router-link :to="{ name: 'employees' }" class="nav-link">
           Nhân viên
@@ -39,10 +41,14 @@
           aria-expanded="false"
         >
           <i class="fas fa-user-circle"></i>
-          {{ user.fullName }}
+          {{ user.username }}
         </a>
 
-        <ul class="dropdown-menu dropdown-menu-right" data-display="static">
+        <ul
+          class="dropdown-menu dropdown-menu-right"
+          data-display="static"
+          style="min-width: 250px"
+        >
           <li class="dropdown-item-text">
             <strong>{{ user.fullName }}</strong>
             <br />

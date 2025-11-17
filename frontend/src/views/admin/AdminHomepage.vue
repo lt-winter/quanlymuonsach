@@ -11,6 +11,6 @@
       </li>
       <li>Báo cáo và thống kê: Xem các báo cáo về hoạt động của thư viện.</li>
     </ul>
-    <p>Sử dụng thanh điều hướng bên trái để truy cập các chức năng quản lý.</p>
+    <p>Sử dụng thanh điều hướng bên trên để truy cập các chức năng quản lý.</p>
   </div>
 </template>
