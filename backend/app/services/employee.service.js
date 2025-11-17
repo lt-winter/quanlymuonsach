@@ -58,7 +58,7 @@ class EmployeeService {
       { returnDocument: "after" },
     );
 
-    return result.value;
+    return result;
   }
 
   async delete(id) {

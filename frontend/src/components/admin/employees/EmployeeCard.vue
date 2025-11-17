@@ -21,6 +21,10 @@ export default {
       {{ employee.diaChi }}
     </div>
     <div class="p-1">
+      <strong>Số điện thoại:</strong>
+      {{ employee.soDienThoai }}
+    </div>
+    <div class="p-1">
       <strong>Tên người dùng:</strong>
       {{ employee.tenNguoiDung }}
     </div>

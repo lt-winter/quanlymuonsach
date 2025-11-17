@@ -3,6 +3,7 @@
     <h4>Chỉnh sửa thông tin Nhân viên</h4>
     <EmployeeForm
       :employee="employee"
+      :isEdit="true"
       @submit:employee="updateEmployee"
       @delete:employee="deleteEmployee"
     />
