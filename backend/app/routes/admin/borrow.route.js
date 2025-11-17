@@ -1,5 +1,5 @@
 const express = require("express");
-const borrows = require("../controllers/admin/borrow.controller");
+const borrows = require("@/controllers/admin/borrow.controller");
 
 const router = express.Router();
 

@@ -1,6 +1,6 @@
-const EmployeeService = require("../services/admin/employee.service");
-const MongoDB = require("../utils/mongodb.util");
-const ApiError = require("../api-error");
+const EmployeeService = require("@/services/admin/employee.service");
+const MongoDB = require("@/utils/mongodb.util");
+const ApiError = require("@/api-error");
 const jwt = require("jsonwebtoken");
 
 exports.login = async (req, res, next) => {

@@ -1,7 +1,7 @@
 import createApiClient from "./api.service";
 
 class PublisherService {
-  constructor(baseUrl = "/api/publishers") {
+  constructor(baseUrl = "/api/admin/publishers") {
     this.api = createApiClient(baseUrl);
   }
   async getAll(params = {}) {

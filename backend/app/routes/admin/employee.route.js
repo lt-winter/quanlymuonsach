@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const employee = require("../controllers/admin/employee.controller");
+const employee = require("@/controllers/admin/employee.controller");
 
-const auth = require("../middlewares/auth");
-const superadmin = require("../middlewares/superadmin");
+const auth = require("@/middlewares/auth");
+const superadmin = require("@/middlewares/superadmin");
 
 // LOGIN – không cần auth
 router.post("/login", employee.login);

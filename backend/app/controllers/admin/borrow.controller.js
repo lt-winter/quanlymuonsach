@@ -1,6 +1,6 @@
-const BorrowService = require("../services/admin/borrow.service");
-const MongoDB = require("../utils/mongodb.util");
-const ApiError = require("../api-error");
+const BorrowService = require("@/services/admin/borrow.service");
+const MongoDB = require("@/utils/mongodb.util");
+const ApiError = require("@/api-error");
 
 exports.findAll = async (req, res, next) => {
   let documents = [];

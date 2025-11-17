@@ -1,7 +1,7 @@
 import createApiClient from "./api.service";
 
 class ReaderService {
-  constructor(baseUrl = "/api/readers") {
+  constructor(baseUrl = "/api/admin/readers") {
     this.api = createApiClient(baseUrl);
   }
   async getAll(params = {}) {
