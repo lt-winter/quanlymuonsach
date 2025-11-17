@@ -57,10 +57,24 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
   const user = JSON.parse(localStorage.getItem("user"));
 
-  // Nếu chưa login mà vào trang admin → redirect về login
+  // Nếu chưa login mà vào trang admin -> redirect về login
   if (to.path.startsWith("/admin") && to.name !== "admin.login") {
     if (!user) {
       return next({ name: "admin.login" });
+    }
+  }
+
+  // Nếu đã login mà vào trang login -> redirect về trang admin
+  if (to.name === "admin.login") {
+    if (user) {
+      return next({ path: "/admin" });
+    }
+  }
+
+  // Nếu không phải superadmin mà vào trang quản lý nhân viên -> redirect về trang chủ
+  if (to.path.startsWith("/admin/employees")) {
+    if (user && user.role !== "superadmin") {
+      return next({ path: "/admin" });
     }
   }
 

@@ -10,6 +10,7 @@ router.post("/login", employee.login);
 
 // Tất cả route phía dưới cần đăng nhập
 router.use(auth);
+router.use(superadmin);
 
 // SUPERADMIN
 router.get("/", employee.findAll);
