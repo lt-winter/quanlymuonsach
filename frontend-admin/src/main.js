@@ -5,6 +5,7 @@ import "jquery";
 import "popper.js";
 import "bootstrap/dist/js/bootstrap.min.js";
 import "@fortawesome/fontawesome-free/css/all.min.css";
+import "./assets/style.css";
 import "./assets/form.css";
 
 import router from "./router";
