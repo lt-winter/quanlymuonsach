@@ -1,0 +1,132 @@
+<template>
+  <div class="books-page">
+    <h2 class="mb-4">
+      <i class="fas fa-book"></i> Danh sách sách
+    </h2>
+
+    <!-- Search and Filter -->
+    <div class="row mb-4">
+      <div class="col-md-6">
+        <div class="input-group">
+          <input
+            type="text"
+            class="form-control"
+            placeholder="Tìm kiếm sách..."
+            v-model="searchText"
+          />
+          <div class="input-group-append">
+            <button class="btn btn-primary" @click="search">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <select v-model="sortBy" class="form-control" @change="fetchBooks">
+          <option value="">Sắp xếp theo</option>
+          <option value="tenSach">Tên sách</option>
+          <option value="tacGia">Tác giả</option>
+          <option value="namXuatBan">Năm xuất bản</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <select v-model="order" class="form-control" @change="fetchBooks">
+          <option value="asc">Tăng dần</option>
+          <option value="desc">Giảm dần</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div v-if="loading" class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="sr-only">Đang tải...</span>
+      </div>
+    </div>
+
+    <!-- Books Grid -->
+    <div v-else>
+      <div v-if="filteredBooks.length === 0" class="text-center py-5">
+        <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
+        <p class="text-muted">Không tìm thấy sách nào</p>
+      </div>
+
+      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+        <div v-for="book in filteredBooks" :key="book._id" class="col mb-4">
+          <div class="card h-100 shadow-sm">
+            <img
+              :src="book.image || '/placeholder-book.svg'"
+              class="card-img-top"
+              style="height: 200px; object-fit: cover"
+            />
+            <div class="card-body d-flex flex-column">
+              <h6 class="card-title">{{ book.tenSach }}</h6>
+              <p class="card-text text-muted small mb-2">
+                <i class="fas fa-user"></i> {{ book.tacGia }}
+              </p>
+              <p class="card-text small">
+                <span class="badge badge-info">{{ book.soQuyen }} quyển</span>
+              </p>
+              <div class="mt-auto">
+                <router-link
+                  :to="{ name: 'book.detail', params: { id: book._id } }"
+                  class="btn btn-sm btn-primary w-100"
+                >
+                  <i class="fas fa-eye"></i> Xem chi tiết
+                </router-link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import BookService from "@/services/book.service";
+
+export default {
+  data() {
+    return {
+      books: [],
+      searchText: "",
+      sortBy: "",
+      order: "asc",
+      loading: false,
+    };
+  },
+  computed: {
+    filteredBooks() {
+      if (!this.searchText) return this.books;
+      const search = this.searchText.toLowerCase();
+      return this.books.filter(
+        (book) =>
+          book.tenSach?.toLowerCase().includes(search) ||
+          book.tacGia?.toLowerCase().includes(search)
+      );
+    },
+  },
+  methods: {
+    async fetchBooks() {
+      this.loading = true;
+      try {
+        this.books = await BookService.getAll({
+          sortBy: this.sortBy,
+          order: this.order,
+        });
+      } catch (error) {
+        console.error("Error fetching books:", error);
+      } finally {
+        this.loading = false;
+      }
+    },
+    search() {
+      // Filter is computed, no need to fetch again
+    },
+  },
+  mounted() {
+    this.fetchBooks();
+  },
+};
+</script>
