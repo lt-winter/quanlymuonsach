@@ -57,7 +57,7 @@
     <!-- Nhà xuất bản -->
     <div
       class="form-group position-relative"
-      @click.outside="showDropdown = false"
+      ref="publisherDropdown"
     >
       <label for="maNXB">Nhà xuất bản</label>
 
@@ -258,6 +258,14 @@ export default {
     deleteBook() {
       this.$emit("delete:book", this.bookLocal._id);
     },
+    
+    handleClickOutside(event) {
+      const dropdown = this.$refs.publisherDropdown;
+      if (dropdown && !dropdown.contains(event.target)) {
+        this.showDropdown = false;
+      }
+    },
+    
     Cancel() {
       const reply = window.confirm(
         "Bạn có chắc muốn hủy không? Mọi thay đổi sẽ không được lưu."
@@ -270,6 +278,11 @@ export default {
 
   async mounted() {
     await this.fetchPublishers();
+    document.addEventListener("click", this.handleClickOutside);
+  },
+  
+  beforeUnmount() {
+    document.removeEventListener("click", this.handleClickOutside);
   },
 };
 </script>
