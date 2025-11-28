@@ -18,7 +18,10 @@
 
     <div class="toolbar">
       <div class="toolbar-left">
-        <InputSearch v-model="searchText" placeholder="Tìm kiếm sách..." />
+        <InputSearch
+          v-model="searchText"
+          placeholder="Nhập tên sách hoặc tác giả..."
+        />
       </div>
       <div class="toolbar-right">
         <div class="sort-controls">
@@ -63,11 +66,6 @@
       <div v-else class="empty-state">
         <i class="fas fa-book-open"></i>
         <h4>Không có sách nào</h4>
-        <p>Bắt đầu bằng cách thêm sách mới vào thư viện</p>
-        <button class="action-btn add" @click="goToAddBook">
-          <i class="fas fa-plus"></i>
-          Thêm sách mới
-        </button>
       </div>
     </div>
   </div>
@@ -112,8 +110,8 @@ export default {
   computed: {
     bookString() {
       return this.books.map((book) => {
-        const { tenSach } = book;
-        return [tenSach].join("").toLowerCase();
+        const { tenSach, tacGia } = book;
+        return [tenSach, tacGia].join("").toLowerCase();
       });
     },
     filteredBooks() {

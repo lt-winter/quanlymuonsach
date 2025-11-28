@@ -3,6 +3,18 @@ export default {
   props: {
     reader: { type: Object, required: true },
   },
+  computed: {
+    genderClass() {
+      if (this.reader.phai === 'Nam') return 'male';
+      if (this.reader.phai === 'Nữ') return 'female';
+      return 'other';
+    },
+    genderIcon() {
+      if (this.reader.phai === 'Nam') return 'fas fa-mars';
+      if (this.reader.phai === 'Nữ') return 'fas fa-venus';
+      return 'fas fa-genderless';
+    },
+  },
 };
 </script>
 
@@ -14,8 +26,8 @@ export default {
       </div>
       <div class="header-info">
         <h4>{{ reader.hoLot }} {{ reader.ten }}</h4>
-        <span class="gender-badge" :class="reader.phai === 'Nam' ? 'male' : 'female'">
-          <i :class="reader.phai === 'Nam' ? 'fas fa-mars' : 'fas fa-venus'"></i>
+        <span class="gender-badge" :class="genderClass">
+          <i :class="genderIcon"></i>
           {{ reader.phai }}
         </span>
       </div>
@@ -108,6 +120,11 @@ export default {
 .gender-badge.female {
   background: rgba(236, 72, 153, 0.3);
   color: #fbcfe8;
+}
+
+.gender-badge.other {
+  background: rgba(139, 92, 246, 0.3);
+  color: #ddd6fe;
 }
 
 .card-body {

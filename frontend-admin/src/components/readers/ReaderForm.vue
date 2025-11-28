@@ -20,21 +20,45 @@
       />
       <ErrorMessage name="ten" class="error-feedback" />
     </div>
-    <div class="form-group">
+
+    <div class="form-group position-relative" ref="genderDropdown">
       <label for="phai">Phái</label>
-      <Field
-        name="phai"
-        as="select"
-        class="form-control"
-        v-model="readerLocal.phai"
-      >
-        <option value="">-- Chọn phái --</option>
-        <option value="Nam">Nam</option>
-        <option value="Nữ">Nữ</option>
-        <option value="Khác">Khác</option>
+      <Field name="phai" v-slot="{ field }">
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Chọn phái..."
+          :value="genderDisplay"
+          readonly
+          @focus="showGenderDropdown = true"
+          @click.stop="showGenderDropdown = true"
+        />
+        <div
+          v-if="showGenderDropdown"
+          class="list-group position-absolute w-100 mt-1 shadow-sm"
+          style="max-height: 200px; overflow-y: auto; z-index: 10"
+        >
+          <button
+            v-for="option in genderOptions"
+            :key="option.value"
+            type="button"
+            class="list-group-item list-group-item-action"
+            :class="{ active: option.value === readerLocal.phai }"
+            @click="
+              () => {
+                readerLocal.phai = option.value;
+                field.onChange(option.value);
+                showGenderDropdown = false;
+              }
+            "
+          >
+            {{ option.label }}
+          </button>
+        </div>
       </Field>
       <ErrorMessage name="phai" class="error-feedback" />
     </div>
+
     <div class="form-group">
       <label for="ngaySinh">Ngày sinh</label>
       <Field
@@ -131,7 +155,21 @@ export default {
     return {
       readerLocal: this.reader,
       readerFormSchema,
+      showGenderDropdown: false,
+      genderOptions: [
+        { value: "Nam", label: "Nam" },
+        { value: "Nữ", label: "Nữ" },
+        { value: "Khác", label: "Khác" },
+      ],
     };
+  },
+  computed: {
+    genderDisplay() {
+      const option = this.genderOptions.find(
+        (o) => o.value === this.readerLocal.phai
+      );
+      return option ? option.label : "";
+    },
   },
   methods: {
     submitReader() {
@@ -140,6 +178,18 @@ export default {
     deleteReader() {
       this.$emit("delete:reader", this.readerLocal.id);
     },
+    handleClickOutside(event) {
+      const dropdown = this.$refs.genderDropdown;
+      if (dropdown && !dropdown.contains(event.target)) {
+        this.showGenderDropdown = false;
+      }
+    },
+  },
+  mounted() {
+    document.addEventListener("click", this.handleClickOutside);
+  },
+  beforeUnmount() {
+    document.removeEventListener("click", this.handleClickOutside);
   },
 };
 </script>

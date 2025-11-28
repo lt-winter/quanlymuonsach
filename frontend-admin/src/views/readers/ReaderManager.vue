@@ -28,7 +28,13 @@
             placeholder="Sắp xếp"
           />
           <button class="sort-order-btn" @click="toggleOrder">
-            <i :class="order === 'asc' ? 'fas fa-sort-amount-up' : 'fas fa-sort-amount-down'"></i>
+            <i
+              :class="
+                order === 'asc'
+                  ? 'fas fa-sort-amount-up'
+                  : 'fas fa-sort-amount-down'
+              "
+            ></i>
           </button>
         </div>
         <div class="action-buttons">
@@ -58,10 +64,9 @@
         <div v-else class="empty-state">
           <i class="fas fa-user-slash"></i>
           <h4>Không có độc giả nào</h4>
-          <p>Bắt đầu bằng cách thêm độc giả mới</p>
         </div>
       </div>
-      
+
       <div class="detail-section" v-if="activeReader">
         <div class="detail-header">
           <h4>

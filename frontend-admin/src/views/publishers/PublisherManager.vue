@@ -18,7 +18,10 @@
 
     <div class="toolbar">
       <div class="toolbar-left">
-        <InputSearch v-model="searchText" placeholder="Tìm kiếm nhà xuất bản..." />
+        <InputSearch
+          v-model="searchText"
+          placeholder="Tìm kiếm nhà xuất bản..."
+        />
       </div>
       <div class="toolbar-right">
         <div class="sort-controls">
@@ -28,7 +31,13 @@
             placeholder="Sắp xếp"
           />
           <button class="sort-order-btn" @click="toggleOrder">
-            <i :class="order === 'asc' ? 'fas fa-sort-amount-up' : 'fas fa-sort-amount-down'"></i>
+            <i
+              :class="
+                order === 'asc'
+                  ? 'fas fa-sort-amount-up'
+                  : 'fas fa-sort-amount-down'
+              "
+            ></i>
           </button>
         </div>
         <div class="action-buttons">
@@ -58,10 +67,9 @@
         <div v-else class="empty-state">
           <i class="fas fa-building"></i>
           <h4>Không có nhà xuất bản nào</h4>
-          <p>Bắt đầu bằng cách thêm nhà xuất bản mới</p>
         </div>
       </div>
-      
+
       <div class="detail-section" v-if="activePublisher">
         <div class="detail-header">
           <h4>
@@ -69,7 +77,10 @@
             Chi tiết Nhà xuất bản
           </h4>
           <router-link
-            :to="{ name: 'publishers.edit', params: { id: activePublisher._id } }"
+            :to="{
+              name: 'publishers.edit',
+              params: { id: activePublisher._id },
+            }"
             class="edit-link"
           >
             <i class="fas fa-edit"></i>

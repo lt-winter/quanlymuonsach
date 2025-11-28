@@ -18,7 +18,10 @@
 
     <div class="toolbar">
       <div class="toolbar-left">
-        <InputSearch v-model="searchText" placeholder="Tìm kiếm nhân viên..." />
+        <InputSearch
+          v-model="searchText"
+          placeholder="Nhập thông tin nhân viên..."
+        />
       </div>
       <div class="toolbar-right">
         <div class="sort-controls">
@@ -28,7 +31,13 @@
             placeholder="Sắp xếp"
           />
           <button class="sort-order-btn" @click="toggleOrder">
-            <i :class="order === 'asc' ? 'fas fa-sort-amount-up' : 'fas fa-sort-amount-down'"></i>
+            <i
+              :class="
+                order === 'asc'
+                  ? 'fas fa-sort-amount-up'
+                  : 'fas fa-sort-amount-down'
+              "
+            ></i>
           </button>
         </div>
         <div class="action-buttons">
@@ -57,7 +66,7 @@
           <p>Bắt đầu bằng cách thêm nhân viên mới</p>
         </div>
       </div>
-      
+
       <div class="detail-section" v-if="activeEmployee">
         <div class="detail-header">
           <h4>
