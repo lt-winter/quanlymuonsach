@@ -345,20 +345,20 @@ export default {
 }
 
 .detail-header {
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .detail-header h4 {
-  font-size: 1.1rem;
+  font-size: 0.95rem;
   font-weight: 600;
   color: #1f2937;
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .detail-header > i {
@@ -368,14 +368,14 @@ export default {
 .edit-link {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
+  gap: 5px;
+  padding: 6px 12px;
   background: linear-gradient(135deg, #ffd166, #f5c542);
   color: #1f2937;
-  border-radius: 8px;
+  border-radius: 6px;
   text-decoration: none;
   font-weight: 500;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   transition: all 0.2s ease;
 }
 

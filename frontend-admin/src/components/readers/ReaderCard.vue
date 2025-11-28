@@ -58,45 +58,45 @@ export default {
 <style scoped>
 .reader-card {
   background: white;
-  border-radius: 16px;
+  border-radius: 12px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   overflow: hidden;
 }
 
 .card-header {
   background: linear-gradient(135deg, #4361ee, #7209b7);
-  padding: 24px;
+  padding: 16px;
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 12px;
 }
 
 .avatar {
-  width: 60px;
-  height: 60px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 1.5rem;
+  font-size: 1.1rem;
 }
 
 .header-info h4 {
   color: white;
-  margin: 0 0 8px 0;
+  margin: 0 0 4px 0;
   font-weight: 600;
-  font-size: 1.2rem;
+  font-size: 1rem;
 }
 
 .gender-badge {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 12px;
+  gap: 4px;
+  padding: 2px 10px;
   border-radius: 20px;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   font-weight: 500;
 }
 
@@ -111,14 +111,14 @@ export default {
 }
 
 .card-body {
-  padding: 20px;
+  padding: 14px;
 }
 
 .info-item {
   display: flex;
   align-items: flex-start;
-  gap: 14px;
-  padding: 14px 0;
+  gap: 10px;
+  padding: 10px 0;
   border-bottom: 1px solid #f3f4f6;
 }
 
@@ -127,31 +127,32 @@ export default {
 }
 
 .info-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
   background: #f3f4f6;
   display: flex;
   align-items: center;
   justify-content: center;
   color: #4361ee;
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   flex-shrink: 0;
 }
 
 .info-content {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 1px;
 }
 
 .info-label {
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   color: #6b7280;
 }
 
 .info-value {
   font-weight: 500;
   color: #1f2937;
+  font-size: 0.9rem;
 }
 </style>
