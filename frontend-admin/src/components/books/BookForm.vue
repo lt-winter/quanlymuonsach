@@ -122,6 +122,50 @@
       <ErrorMessage name="tacGia" class="error-feedback" />
     </div>
 
+    <!-- Mô tả -->
+    <div class="form-group">
+      <label for="moTa">Mô tả</label>
+      <Field
+        name="moTa"
+        as="textarea"
+        class="form-control"
+        rows="4"
+        placeholder="Nhập mô tả sách..."
+        v-model="bookLocal.moTa"
+      />
+      <ErrorMessage name="moTa" class="error-feedback" />
+    </div>
+
+    <!-- Ảnh sách -->
+    <div class="form-group">
+      <label for="anhSach">URL Ảnh sách</label>
+      <Field
+        name="anhSach"
+        type="url"
+        class="form-control"
+        placeholder="https://example.com/image.jpg"
+        v-model="bookLocal.anhSach"
+      />
+      <ErrorMessage name="anhSach" class="error-feedback" />
+      
+      <!-- Preview ảnh -->
+      <div class="image-preview mt-2">
+        <img 
+          v-if="bookLocal.anhSach && isValidImageUrl"
+          :src="bookLocal.anhSach" 
+          alt="Preview ảnh sách"
+          @error="handleImageError"
+        />
+        <div v-else class="image-placeholder">
+          <i class="fas fa-image"></i>
+          <span>Chưa có ảnh</span>
+        </div>
+      </div>
+      <div v-if="bookLocal.anhSach && !isValidImageUrl" class="image-error mt-2">
+        <i class="fas fa-exclamation-triangle"></i> URL ảnh không hợp lệ
+      </div>
+    </div>
+
     <div class="form-group d-flex mt-3">
       <button class="btn btn-primary">
         <i class="fa-solid fa-floppy-disk"></i> Lưu
@@ -167,6 +211,20 @@ export default {
         .min(1900)
         .max(new Date().getFullYear()),
       maNXB: yup.string().required("Phải chọn nhà xuất bản."),
+      moTa: yup
+        .string()
+        .nullable()
+        .notRequired()
+        .max(2000, "Mô tả tối đa 2000 ký tự."),
+      anhSach: yup
+        .string()
+        .nullable()
+        .notRequired()
+        .test("is-valid-image-url", "URL phải là đường dẫn đến file ảnh (jpg, png, gif, webp, svg)", (value) => {
+          if (!value || value === "") return true;
+          const urlPattern = /^https?:\/\/.+\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i;
+          return urlPattern.test(value);
+        }),
     });
 
     return {
@@ -175,6 +233,7 @@ export default {
       showDropdown: false,
       publishers: [],
       publisherSearch: "",
+      imageLoadError: false,
     };
   },
 
@@ -202,6 +261,10 @@ export default {
     publishers() {
       this.syncPublisherSearch();
     },
+    
+    "bookLocal.anhSach"() {
+      this.imageLoadError = false;
+    },
   },
 
   computed: {
@@ -210,6 +273,11 @@ export default {
       return this.publishers.filter((p) =>
         p.tenNXB.toLowerCase().includes(this.publisherSearch.toLowerCase())
       );
+    },
+    isValidImageUrl() {
+      if (!this.bookLocal.anhSach) return false;
+      const urlPattern = /^https?:\/\/.+\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i;
+      return urlPattern.test(this.bookLocal.anhSach) && !this.imageLoadError;
     },
     formattedDonGia() {
       if (!this.bookLocal.donGia) return "";
@@ -266,6 +334,10 @@ export default {
       }
     },
     
+    handleImageError() {
+      this.imageLoadError = true;
+    },
+    
     Cancel() {
       const reply = window.confirm(
         "Bạn có chắc muốn hủy không? Mọi thay đổi sẽ không được lưu."
@@ -292,5 +364,47 @@ export default {
 .page {
   max-width: 576px;
   margin: auto;
+}
+
+.image-preview {
+  border: 2px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px;
+  background: #f8fafc;
+  text-align: center;
+}
+
+.image-preview img {
+  max-width: 100%;
+  max-height: 200px;
+  border-radius: 4px;
+  object-fit: contain;
+}
+
+.image-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 150px;
+  color: #94a3b8;
+  gap: 8px;
+}
+
+.image-placeholder i {
+  font-size: 2.5rem;
+}
+
+.image-placeholder span {
+  font-size: 0.875rem;
+}
+
+.image-error {
+  color: #dc3545;
+  font-size: 0.875rem;
+  padding: 8px;
+  background: #fff5f5;
+  border: 1px solid #feb2b2;
+  border-radius: 4px;
 }
 </style>

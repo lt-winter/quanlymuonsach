@@ -254,6 +254,9 @@ export default {
   align-items: center;
   gap: 20px;
   flex-wrap: wrap;
+  position: sticky;
+  top: 80px;
+  z-index: 100;
 }
 
 .toolbar-left {
@@ -349,7 +352,7 @@ export default {
 
 .detail-section {
   position: sticky;
-  top: 80px;
+  top: 210px;
   height: fit-content;
 }
 

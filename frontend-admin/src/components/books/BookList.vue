@@ -24,7 +24,7 @@ export default {
         <div class="book-card" @click="navigate">
           <div class="book-image-wrapper">
             <img
-              :src="book.image || '/placeholder-book.svg'"
+              :src="book.anhSach || '/placeholder-book.svg'"
               class="book-image"
               :alt="book.tenSach"
             />

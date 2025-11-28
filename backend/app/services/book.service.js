@@ -10,8 +10,10 @@ class BookService {
       donGia: payload.donGia,
       soQuyen: payload.soQuyen,
       namXuatBan: payload.namXuatBan,
-      maNXB: new ObjectId(payload.maNXB),
+      maNXB: payload.maNXB ? new ObjectId(payload.maNXB) : undefined,
       tacGia: payload.tacGia,
+      anhSach: payload.anhSach,
+      moTa: payload.moTa,
     };
     Object.keys(sach).forEach(
       (key) => sach[key] === undefined && delete sach[key],
