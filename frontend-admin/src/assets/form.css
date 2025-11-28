@@ -1,24 +1,66 @@
-label {
-    display: block;
-    margin-top: 10px;
+/* ===== CSS Variables ===== */
+:root {
+    --primary-color: #4361ee;
+    --primary-dark: #3651d4;
+    --secondary-color: #7209b7;
+    --success-color: #06d6a0;
+    --danger-color: #ef476f;
+    --warning-color: #ffd166;
+    --info-color: #118ab2;
+    --light-bg: #f8f9fa;
+    --dark-bg: #1a1a2e;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --border-radius: 12px;
+    --transition: all 0.3s ease;
 }
 
+/* ===== Form Styles ===== */
+label {
+    display: block;
+    margin-top: 12px;
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+}
+
+.form-control {
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    transition: var(--transition);
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+/* ===== Card Styles ===== */
 .card-container.card {
-    max-width: 400px !important;
-    padding: 40px 40px;
+    max-width: 450px !important;
+    padding: 40px;
 }
 
 .card {
-    background-color: #f7f7f7;
-    padding: 20px 25px 30px;
+    background-color: #ffffff;
+    padding: 24px;
     margin: 0 auto 25px;
-    margin-top: 50px;
-    -moz-border-radius: 2px;
-    -webkit-border-radius: 2px;
-    border-radius: 2px;
-    -moz-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
-    -webkit-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
-    box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    border: 1px solid #e5e7eb;
+    transition: var(--transition);
+}
+
+.card:hover {
+    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-2px);
 }
 
 .profile-img-card {
@@ -26,11 +68,196 @@ label {
     height: 96px;
     margin: 0 auto 10px;
     display: block;
-    -moz-border-radius: 50%;
-    -webkit-border-radius: 50%;
     border-radius: 50%;
+    border: 3px solid var(--primary-color);
 }
 
+/* ===== Error Feedback ===== */
 .error-feedback {
-    color: red;
+    color: var(--danger-color);
+    font-size: 0.85rem;
+    margin-top: 4px;
+    display: block;
+}
+
+/* ===== Button Styles ===== */
+.btn {
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 500;
+    transition: var(--transition);
+    border: none;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--primary-dark), #5c0d99);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(67, 97, 238, 0.4);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, var(--success-color), #05b384);
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #05b384, #049a72);
+    transform: translateY(-1px);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, var(--danger-color), #dc3856);
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #dc3856, #c82d49);
+    transform: translateY(-1px);
+}
+
+/* ===== List Group Styles ===== */
+.list-group-item {
+    border: none;
+    border-bottom: 1px solid #e5e7eb;
+    padding: 14px 18px;
+    cursor: pointer;
+    transition: var(--transition);
+    border-radius: 0;
+}
+
+.list-group-item:first-child {
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+.list-group-item:last-child {
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+    border-bottom: none;
+}
+
+.list-group-item:hover {
+    background-color: #f3f4f6;
+    padding-left: 24px;
+}
+
+.list-group-item.active {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border-color: transparent;
+    color: white;
+}
+
+.list-group {
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    overflow: hidden;
+}
+
+/* ===== Page Title ===== */
+.page-title {
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.page-title i {
+    color: var(--primary-color);
+}
+
+/* ===== Badge Styles ===== */
+.badge {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+.badge-warning {
+    background: linear-gradient(135deg, var(--warning-color), #f5c542);
+    color: #1f2937;
+}
+
+/* ===== Action Buttons Container ===== */
+.action-buttons {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding: 20px 0;
+}
+
+/* ===== Detail Card ===== */
+.detail-card {
+    background: linear-gradient(135deg, #f8f9fa, #ffffff);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    box-shadow: var(--card-shadow);
+}
+
+.detail-card .detail-item {
+    padding: 10px 0;
+    border-bottom: 1px dashed #e5e7eb;
+}
+
+.detail-card .detail-item:last-child {
+    border-bottom: none;
+}
+
+.detail-card strong {
+    color: #6b7280;
+    font-size: 0.85rem;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.detail-card .detail-value {
+    color: #1f2937;
+    font-weight: 500;
+}
+
+/* ===== Page Header Form (Add/Edit pages) ===== */
+.page-header-form {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.page-header-form h4 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1f2937;
+}
+
+.btn-back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    background: linear-gradient(135deg, #6b7280, #4b5563);
+    color: white;
+    border-radius: 10px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-back:hover {
+    background: linear-gradient(135deg, #4b5563, #374151);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+    color: white;
+    text-decoration: none;
+}
+
+.btn-back i {
+    font-size: 1rem;
 }
