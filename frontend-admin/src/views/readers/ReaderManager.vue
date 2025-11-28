@@ -188,9 +188,9 @@ export default {
 
 .page-header {
   background: linear-gradient(135deg, #7c3aed, #8b5cf6);
-  border-radius: 20px;
-  padding: 30px 40px;
-  margin-bottom: 30px;
+  border-radius: 16px;
+  padding: 20px 28px;
+  margin-bottom: 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -198,52 +198,52 @@ export default {
 }
 
 .page-title {
-  font-size: 1.75rem;
+  font-size: 1.35rem;
   font-weight: 700;
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .page-title i {
   background: rgba(255, 255, 255, 0.2);
-  width: 48px;
-  height: 48px;
+  width: 38px;
+  height: 38px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 12px;
-  font-size: 1.25rem;
+  border-radius: 10px;
+  font-size: 1rem;
 }
 
 .page-subtitle {
-  margin: 8px 0 0 0;
+  margin: 4px 0 0 0;
   opacity: 0.9;
-  font-size: 0.95rem;
+  font-size: 0.85rem;
 }
 
 .header-stats {
   display: flex;
-  gap: 20px;
+  gap: 16px;
 }
 
 .stat-item {
   background: rgba(255, 255, 255, 0.15);
-  padding: 16px 24px;
-  border-radius: 12px;
+  padding: 10px 18px;
+  border-radius: 10px;
   text-align: center;
   backdrop-filter: blur(10px);
 }
 
 .stat-number {
   display: block;
-  font-size: 2rem;
+  font-size: 1.5rem;
   font-weight: 700;
 }
 
 .stat-label {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   opacity: 0.9;
 }
 
