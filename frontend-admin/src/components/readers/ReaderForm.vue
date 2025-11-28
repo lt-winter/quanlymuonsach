@@ -66,7 +66,7 @@
       <ErrorMessage name="dienThoai" class="error-feedback" />
     </div>
 
-    <div class="form-group d-flex gap-3 mt-3">
+    <div class="form-group d-flex mt-3">
       <button class="btn btn-primary">
         <i class="fa-solid fa-floppy-disk"></i> Lưu
       </button>
