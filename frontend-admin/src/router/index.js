@@ -47,6 +47,15 @@ const routes = [
     name: "notfound",
     component: () => import("@/views/NotFound.vue"),
   },
+
+  // Redirect /admin to /
+  {
+    path: "/admin/:pathMatch(.*)*",
+    redirect: to => {
+      const subPath = to.params.pathMatch ? to.params.pathMatch.join('/') : '';
+      return '/' + subPath;
+    }
+  },
 ];
 
 const router = createRouter({
@@ -54,15 +63,43 @@ const router = createRouter({
   routes,
 });
 
+/* Kiểm tra session hết hạn */
+function isSessionExpired() {
+  const expiry = localStorage.getItem("admin_session_expiry");
+  if (!expiry) return true;
+  return Date.now() > parseInt(expiry);
+}
+
+/* Refresh session (gia hạn thêm 15 phút khi hoạt động) */
+function refreshSession() {
+  const expiryTime = Date.now() + 15 * 60 * 1000; // 15 phút
+  localStorage.setItem("admin_session_expiry", expiryTime.toString());
+}
+
+/* Xóa session */
+function clearSession() {
+  localStorage.removeItem("admin_user");
+  localStorage.removeItem("admin_token");
+  localStorage.removeItem("admin_session_expiry");
+}
+
 /* Route Guard (bảo vệ trang admin) */
 router.beforeEach((to, from, next) => {
   const user = JSON.parse(localStorage.getItem("admin_user"));
+
+  // Kiểm tra session hết hạn
+  if (user && isSessionExpired()) {
+    clearSession();
+    return next({ name: "login" });
+  }
 
   // Nếu chưa login mà vào trang admin -> redirect về login
   if (to.name !== "login") {
     if (!user) {
       return next({ name: "login" });
     }
+    // Gia hạn session khi hoạt động
+    refreshSession();
   }
 
   // Nếu đã login mà vào trang login -> redirect về trang chủ

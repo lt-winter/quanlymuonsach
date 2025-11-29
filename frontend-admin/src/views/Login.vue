@@ -77,8 +77,11 @@ export default {
           return;
         }
 
+        // Lưu session với thời hạn 15 phút
+        const expiryTime = Date.now() + 15 * 60 * 1000; // 15 phút
         localStorage.setItem("admin_user", JSON.stringify(res.user));
         localStorage.setItem("admin_token", res.token);
+        localStorage.setItem("admin_session_expiry", expiryTime.toString());
 
         this.$router.push("/");
       } catch (err) {
