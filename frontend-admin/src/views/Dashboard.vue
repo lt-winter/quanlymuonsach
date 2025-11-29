@@ -52,6 +52,19 @@
         </div>
       </router-link>
 
+      <router-link :to="{ name: 'borrows' }" class="feature-card">
+        <div class="feature-icon borrows">
+          <i class="fas fa-book-reader"></i>
+        </div>
+        <div class="feature-content">
+          <h3>Quản lý Mượn sách</h3>
+          <p>Quản lý thông tin các phiếu mượn sách</p>
+        </div>
+        <div class="feature-arrow">
+          <i class="fas fa-arrow-right"></i>
+        </div>
+      </router-link>
+
       <div class="feature-card coming-soon">
         <div class="feature-icon reports">
           <i class="fas fa-chart-bar"></i>
@@ -67,7 +80,10 @@
     <div class="info-section">
       <div class="info-card">
         <i class="fas fa-lightbulb"></i>
-        <p>Sử dụng thanh điều hướng bên trên để truy cập nhanh các chức năng quản lý</p>
+        <p>
+          Sử dụng thanh điều hướng bên trên để truy cập nhanh các chức năng quản
+          lý
+        </p>
       </div>
     </div>
   </div>
@@ -89,7 +105,7 @@
 }
 
 .welcome-section::before {
-  content: '';
+  content: "";
   position: absolute;
   top: -50%;
   right: -20%;
@@ -100,7 +116,7 @@
 }
 
 .welcome-section::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -30%;
   left: -10%;
@@ -191,6 +207,10 @@
 
 .feature-icon.publishers {
   background: linear-gradient(135deg, #7209b7, #5c0d99);
+}
+
+.feature-icon.borrows {
+  background: linear-gradient(135deg, #f72585, #b5179e);
 }
 
 .feature-icon.reports {

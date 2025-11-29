@@ -66,6 +66,7 @@
         type="date"
         class="form-control"
         v-model="readerLocal.ngaySinh"
+        :max="today"
       />
       <ErrorMessage name="ngaySinh" class="error-feedback" />
     </div>
@@ -156,6 +157,7 @@ export default {
       readerLocal: this.reader,
       readerFormSchema,
       showGenderDropdown: false,
+      today: new Date().toISOString().split('T')[0],
       genderOptions: [
         { value: "Nam", label: "Nam" },
         { value: "Nữ", label: "Nữ" },
