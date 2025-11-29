@@ -78,7 +78,7 @@
         <p>Xác nhận trả sách: <strong>{{ selectedBorrow?.sach?.tenSach }}</strong></p>
         <div class="form-group">
           <label>Ngày trả</label>
-          <input type="date" class="form-control" v-model="returnDate" />
+          <DatePicker v-model="returnDate" placeholder="Chọn ngày trả..." />
         </div>
         <div v-if="lateFee > 0" class="fee-warning">
           <i class="fas fa-exclamation-triangle"></i>
@@ -97,6 +97,7 @@
 import InputSearch from "@/components/InputSearch.vue";
 import CustomSelect from "@/components/CustomSelect.vue";
 import BorrowList from "@/components/borrows/BorrowList.vue";
+import DatePicker from "@/components/DatePicker.vue";
 import BorrowService from "@/services/borrow.service";
 
 export default {
@@ -104,6 +105,7 @@ export default {
     InputSearch,
     CustomSelect,
     BorrowList,
+    DatePicker,
   },
   data() {
     return {

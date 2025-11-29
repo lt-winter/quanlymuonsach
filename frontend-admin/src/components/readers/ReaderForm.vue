@@ -61,13 +61,12 @@
 
     <div class="form-group">
       <label for="ngaySinh">Ngày sinh</label>
-      <Field
-        name="ngaySinh"
-        type="date"
-        class="form-control"
+      <DatePicker
         v-model="readerLocal.ngaySinh"
-        :max="today"
+        placeholder="Chọn ngày sinh..."
+        :max-date="new Date()"
       />
+      <Field name="ngaySinh" v-model="readerLocal.ngaySinh" class="d-none" />
       <ErrorMessage name="ngaySinh" class="error-feedback" />
     </div>
     <div class="form-group">
@@ -110,12 +109,14 @@
 <script>
 import * as yup from "yup";
 import { Form, Field, ErrorMessage } from "vee-validate";
+import DatePicker from "@/components/DatePicker.vue";
 
 export default {
   components: {
     Form,
     Field,
     ErrorMessage,
+    DatePicker,
   },
   emits: ["submit:reader", "delete:reader"],
   props: {
@@ -157,7 +158,6 @@ export default {
       readerLocal: this.reader,
       readerFormSchema,
       showGenderDropdown: false,
-      today: new Date().toISOString().split('T')[0],
       genderOptions: [
         { value: "Nam", label: "Nam" },
         { value: "Nữ", label: "Nữ" },
