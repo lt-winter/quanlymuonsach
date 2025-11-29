@@ -24,6 +24,12 @@
           <span>Sách</span>
         </router-link>
       </li>
+      <li class="nav-item">
+        <router-link :to="{ name: 'borrows' }" class="nav-link nav-link-custom">
+          <i class="fas fa-book-reader"></i>
+          <span>Mượn sách</span>
+        </router-link>
+      </li>
 
       <li class="nav-item" v-if="user && user.role === 'superadmin'">
         <span class="nav-divider"></span>
@@ -93,6 +99,7 @@ export default {
     logout() {
       localStorage.removeItem("admin_user");
       localStorage.removeItem("admin_token");
+      localStorage.removeItem("admin_session_expiry");
       this.$router.push("/login");
     },
   },

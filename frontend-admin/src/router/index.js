@@ -6,6 +6,7 @@ import AuthLayout from "@/layouts/AuthLayout.vue";
 import readerRoutes from "./routes/reader.route";
 import publisherRoutes from "./routes/publisher.route";
 import bookRoutes from "./routes/book.route";
+import borrowRoutes from "./routes/borrow.route";
 import employeeRoutes from "./routes/employee.route";
 
 const routes = [
@@ -30,6 +31,7 @@ const routes = [
       ...readerRoutes,
       ...publisherRoutes,
       ...bookRoutes,
+      ...borrowRoutes,
       ...employeeRoutes,
 
       // Trang mặc định
