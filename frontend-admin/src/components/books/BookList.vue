@@ -15,9 +15,9 @@ export default {
 
 <template>
   <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-    <div v-for="book in books" :key="book._id" class="col">
+    <div v-for="book in books" :key="book.maSach" class="col">
       <router-link
-        :to="{ name: 'books.edit', params: { id: book._id } }"
+        :to="{ name: 'books.edit', params: { id: book.maSach } }"
         custom
         v-slot="{ navigate }"
       >

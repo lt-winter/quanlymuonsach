@@ -1,13 +1,21 @@
+const CodeGenerator = require("@/utils/codeGenerator.util");
+
 class BorrowService {
   constructor(client) {
+    this.client = client;
     this.Borrow = client.db().collection("theodoimuonsach");
+    this.codeGenerator = new CodeGenerator(client);
   }
+
+  // Hạn trả sách: 14 ngày
+  static LOAN_PERIOD_DAYS = 14;
+
   extractBorrowData(payload) {
     const borrow = {
-      maDocGia: payload.maDocGia,
-      maSach: payload.maSach,
+      maDocGia: payload.maDocGia, // Giờ là string (DG00001)
+      maSach: payload.maSach,     // Giờ là string (SA00001)
       maNhanVien: payload.maNhanVien,
-      ngayMuon: payload.ngayMuon,
+      ngayMuon: payload.ngayMuon ? new Date(payload.ngayMuon) : undefined,
       ngayTraDuKien: payload.ngayTraDuKien,
       ngayTraThucTe: payload.ngayTraThucTe,
     };
@@ -20,39 +28,70 @@ class BorrowService {
     return await cursor.toArray();
   }
 
-  // Cho độc giả mượn sách
+  // User đăng ký mượn sách (chờ duyệt)
   async borrow(maDocGia, maSach, ngayMuon) {
+    // Sinh mã mượn sách tự động (MS00001, MS00002, ...) - _id để MongoDB tự sinh ObjectId
+    const maMuon = await this.codeGenerator.generateBorrowCode();
+    
     const data = {
-      maDocGia: new ObjectId(maDocGia),
-      maSach: new ObjectId(maSach),
-      ngayMuon,
+      maMuon,
+      maDocGia,
+      maSach,
+      ngayMuon: new Date(ngayMuon),
       ngayTra: null,
+      trangThai: "choDuyet", // Trạng thái chờ admin duyệt
+      tienPhat: 0,
+      tienBoiThuong: 0,
+      nguoiDuyet: null, // Sẽ được cập nhật khi admin duyệt
+      ngayTao: new Date(),
+      ngayCapNhat: new Date(),
     };
-    const result = await this.Borrow.findOneAndUpdate(
-      data,
-      { $set: { ...data, ngayTao: new Date(), ngayCapNhat: new Date() } },
-      { returnDocument: "after", upsert: true },
-    );
-    return { _id: result.value._id, ...data };
+    
+    const result = await this.Borrow.insertOne(data);
+    return data;
   }
 
   // Trả sách
   async returnBook(borrowId, ngayTra) {
     return await this.Borrow.findOneAndUpdate(
-      { _id: new ObjectId(borrowId) },
-      { $set: { ngayTra } },
+      { _id: borrowId },
+      { $set: { ngayTra: new Date(ngayTra), ngayCapNhat: new Date() } },
       { returnDocument: "after" },
     );
   }
 
   // Tìm các bản ghi mượn theo độc giả
   async findByReader(readerId) {
-    return this.Borrow.find({ maDocGia: new ObjectId(readerId) }).toArray();
+    const pipeline = [
+      { $match: { maDocGia: readerId } },
+      {
+        $lookup: {
+          from: "sach",
+          localField: "maSach",
+          foreignField: "maSach",
+          as: "sach",
+        },
+      },
+      { $unwind: { path: "$sach", preserveNullAndEmptyArrays: true } },
+      {
+        $addFields: {
+          hanTra: {
+            $dateAdd: {
+              startDate: "$ngayMuon",
+              unit: "day",
+              amount: BorrowService.LOAN_PERIOD_DAYS,
+            },
+          },
+        },
+      },
+      { $sort: { ngayMuon: -1 } },
+    ];
+    return await this.Borrow.aggregate(pipeline).toArray();
   }
 
   // Tìm các bản ghi mượn theo sách
   async findByBook(bookId) {
-    return this.Borrow.find({ maSach: new ObjectId(bookId) }).toArray();
+    return this.Borrow.find({ maSach: bookId }).toArray();
   }
 
   // Tìm các bản ghi chưa trả

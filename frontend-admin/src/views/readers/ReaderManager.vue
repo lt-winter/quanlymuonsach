@@ -74,7 +74,10 @@
             Chi tiết Độc giả
           </h4>
           <router-link
-            :to="{ name: 'readers.edit', params: { id: activeReader._id } }"
+            :to="{
+              name: 'readers.edit',
+              params: { id: activeReader.maDocGia },
+            }"
             class="edit-link"
           >
             <i class="fas fa-edit"></i>

@@ -11,6 +11,9 @@ router.route("/")
 router.route("/stats")
   .get(borrows.getStats);
 
+router.route("/pending")
+  .get(borrows.findPending);
+
 router.route("/:id")
   .get(borrows.findOne)
   .put(borrows.update)
@@ -21,5 +24,11 @@ router.route("/:id/return")
 
 router.route("/:id/lost")
   .post(borrows.reportLost);
+
+router.route("/:id/approve")
+  .post(borrows.approve);
+
+router.route("/:id/reject")
+  .post(borrows.reject);
 
 module.exports = router;

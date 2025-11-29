@@ -2,7 +2,7 @@ const BorrowService = require("@/services/admin/borrow.service");
 const MongoDB = require("@/utils/mongodb.util");
 const ApiError = require("@/api-error");
 
-// Tạo phiếu mượn sách
+// Tạo phiếu mượn sách (Admin tạo - ghi lại người tạo)
 exports.create = async (req, res, next) => {
   if (!req.body?.maDocGia || !req.body?.maSach) {
     return next(
@@ -11,7 +11,9 @@ exports.create = async (req, res, next) => {
   }
   try {
     const borrowService = new BorrowService(MongoDB.client);
-    const document = await borrowService.create(req.body);
+    // Lấy ID người tạo từ token (đã được xác thực qua middleware)
+    const nguoiTaoId = req.user?._id || null;
+    const document = await borrowService.create(req.body, nguoiTaoId);
     return res.send(document);
   } catch (error) {
     return next(
@@ -31,6 +33,8 @@ exports.findAll = async (req, res, next) => {
       documents = await borrowService.findCurrentlyBorrowed();
     } else if (filter === "quaHan") {
       documents = await borrowService.findOverdue();
+    } else if (filter === "choDuyet") {
+      documents = await borrowService.findPending();
     } else {
       const sort = {};
       if (!sortBy) sort["_id"] = order === "desc" ? -1 : 1;
@@ -151,5 +155,55 @@ exports.getStats = async (req, res, next) => {
     return res.send(stats);
   } catch (error) {
     return next(new ApiError(500, `Lỗi khi lấy thống kê: ${error.message}`));
+  }
+};
+
+// Duyệt phiếu mượn (cho user mượn)
+exports.approve = async (req, res, next) => {
+  try {
+    const borrowService = new BorrowService(MongoDB.client);
+    // Lấy ID người duyệt từ token (đã được xác thực qua middleware)
+    const nguoiDuyetId = req.user?._id || null;
+    const document = await borrowService.approve(req.params.id, nguoiDuyetId);
+    if (!document) {
+      return next(new ApiError(404, "Không tìm thấy phiếu mượn"));
+    }
+    return res.send(document);
+  } catch (error) {
+    return next(
+      new ApiError(500, `Lỗi khi duyệt phiếu mượn: ${error.message}`),
+    );
+  }
+};
+
+// Từ chối phiếu mượn
+exports.reject = async (req, res, next) => {
+  try {
+    const borrowService = new BorrowService(MongoDB.client);
+    // Lấy ID người duyệt từ token (đã được xác thực qua middleware)
+    const nguoiDuyetId = req.user?._id || null;
+    const lyDo = req.body?.lyDo || "";
+    const document = await borrowService.reject(req.params.id, nguoiDuyetId, lyDo);
+    if (!document) {
+      return next(new ApiError(404, "Không tìm thấy phiếu mượn"));
+    }
+    return res.send(document);
+  } catch (error) {
+    return next(
+      new ApiError(500, `Lỗi khi từ chối phiếu mượn: ${error.message}`),
+    );
+  }
+};
+
+// Lấy danh sách phiếu chờ duyệt
+exports.findPending = async (req, res, next) => {
+  try {
+    const borrowService = new BorrowService(MongoDB.client);
+    const documents = await borrowService.findPending();
+    return res.send(documents);
+  } catch (error) {
+    return next(
+      new ApiError(500, `Lỗi khi lấy danh sách phiếu chờ duyệt: ${error.message}`),
+    );
   }
 };

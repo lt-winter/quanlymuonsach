@@ -1,8 +1,10 @@
-const { ObjectId } = require("mongodb");
+const CodeGenerator = require("@/utils/codeGenerator.util");
 
 class PublisherService {
   constructor(client) {
+    this.client = client;
     this.NhaXuatBan = client.db().collection("nhaxuatban");
+    this.codeGenerator = new CodeGenerator(client);
   }
 
   extractPublisherData(payload) {
@@ -18,12 +20,13 @@ class PublisherService {
 
   async create(payload) {
     const nhaXuatBan = this.extractPublisherData(payload);
-    const result = await this.NhaXuatBan.findOneAndUpdate(
-      nhaXuatBan,
-      { $set: { ...nhaXuatBan, ngayTao: new Date(), ngayCapNhat: new Date() } },
-      { returnDocument: "after", upsert: true },
-    );
-    return { _id: result.insertedId, ...nhaXuatBan };
+    // Sinh mã nhà xuất bản tự động (XB00001, XB00002, ...) - _id để MongoDB tự sinh ObjectId
+    nhaXuatBan.maNXB = await this.codeGenerator.generatePublisherCode();
+    nhaXuatBan.ngayTao = new Date();
+    nhaXuatBan.ngayCapNhat = new Date();
+
+    const result = await this.NhaXuatBan.insertOne(nhaXuatBan);
+    return nhaXuatBan;
   }
 
   async find(filter, sort = {}) {
@@ -33,7 +36,7 @@ class PublisherService {
 
   async findByName(name) {
     return await this.find({
-      tenNhaXuatBan: {
+      tenNXB: {
         $regex: new RegExp(new RegExp(name)),
         $options: "i",
       },
@@ -41,15 +44,27 @@ class PublisherService {
   }
 
   async findById(id) {
-    return await this.NhaXuatBan.findOne({
-      _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
-    });
+    // Thử tìm theo _id trước, nếu không có thì tìm theo maNXB
+    const { ObjectId } = require("mongodb");
+    let doc = null;
+    
+    // Nếu id là ObjectId hợp lệ, tìm theo _id
+    if (ObjectId.isValid(id)) {
+      doc = await this.NhaXuatBan.findOne({ _id: new ObjectId(id) });
+    }
+    // Nếu không tìm thấy, thử tìm theo maNXB
+    if (!doc) {
+      doc = await this.NhaXuatBan.findOne({ maNXB: id });
+    }
+    return doc;
   }
 
   async update(id, payload) {
-    const filter = {
-      _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
-    };
+    // Tìm document trước để lấy _id thực
+    const existing = await this.findById(id);
+    if (!existing) return null;
+    
+    const filter = { _id: existing._id };
     const update = this.extractPublisherData(payload);
     update.ngayCapNhat = new Date();
     const result = await this.NhaXuatBan.findOneAndUpdate(
@@ -61,9 +76,11 @@ class PublisherService {
   }
 
   async delete(id) {
-    const result = await this.NhaXuatBan.findOneAndDelete({
-      _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
-    });
+    // Tìm document trước để lấy _id thực
+    const existing = await this.findById(id);
+    if (!existing) return null;
+    
+    const result = await this.NhaXuatBan.findOneAndDelete({ _id: existing._id });
     return result;
   }
 

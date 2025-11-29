@@ -1,5 +1,3 @@
-const { ObjectId } = require("mongodb");
-
 class BookService {
   constructor(client) {
     this.Sach = client.db().collection("sach");
@@ -10,7 +8,7 @@ class BookService {
       donGia: payload.donGia,
       soQuyen: payload.soQuyen,
       namXuatBan: payload.namXuatBan,
-      maNXB: payload.maNXB ? new ObjectId(payload.maNXB) : undefined,
+      maNXB: payload.maNXB, // Giờ là string (XB00001)
       tacGia: payload.tacGia,
       anhSach: payload.anhSach,
       moTa: payload.moTa,
@@ -27,9 +25,19 @@ class BookService {
   }
 
   async findById(id) {
-    return await this.Sach.findOne({
-      _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
-    });
+    // Thử tìm theo _id trước, nếu không có thì tìm theo maSach
+    const { ObjectId } = require("mongodb");
+    let doc = null;
+    
+    // Nếu id là ObjectId hợp lệ, tìm theo _id
+    if (ObjectId.isValid(id)) {
+      doc = await this.Sach.findOne({ _id: new ObjectId(id) });
+    }
+    // Nếu không tìm thấy, thử tìm theo maSach
+    if (!doc) {
+      doc = await this.Sach.findOne({ maSach: id });
+    }
+    return doc;
   }
 }
 

@@ -1,9 +1,11 @@
 const bcrypt = require("bcryptjs");
-const { ObjectId } = require("mongodb");
+const CodeGenerator = require("@/utils/codeGenerator.util");
 
 class EmployeeService {
   constructor(client) {
+    this.client = client;
     this.Employee = client.db().collection("nhanvien");
+    this.codeGenerator = new CodeGenerator(client);
   }
 
   extractEmployeeData(payload) {
@@ -23,13 +25,15 @@ class EmployeeService {
   async create(payload) {
     const data = this.extractEmployeeData(payload);
     data.matKhau = await bcrypt.hash(payload.matKhau, 10);
-
+    
+    // Sinh mã nhân viên tự động (NV00001, NV00002, ...) - _id để MongoDB tự sinh ObjectId
+    data.maNhanVien = await this.codeGenerator.generateEmployeeCode();
     data.ngayTao = new Date();
     data.ngayCapNhat = new Date();
 
     const result = await this.Employee.insertOne(data);
 
-    return { _id: result.insertedId, ...data };
+    return data;
   }
 
   async find(filter = {}) {
@@ -41,13 +45,27 @@ class EmployeeService {
   }
 
   async findById(id) {
-    return await this.Employee.findOne({
-      _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
-    });
+    // Thử tìm theo _id trước, nếu không có thì tìm theo maNhanVien
+    const { ObjectId } = require("mongodb");
+    let doc = null;
+    
+    // Nếu id là ObjectId hợp lệ, tìm theo _id
+    if (ObjectId.isValid(id)) {
+      doc = await this.Employee.findOne({ _id: new ObjectId(id) });
+    }
+    // Nếu không tìm thấy, thờ tìm theo maNhanVien
+    if (!doc) {
+      doc = await this.Employee.findOne({ maNhanVien: id });
+    }
+    return doc;
   }
 
   async update(id, payload) {
-    const filter = { _id: ObjectId.isValid(id) ? new ObjectId(id) : null };
+    // Tìm document trước để lấy _id thực
+    const existing = await this.findById(id);
+    if (!existing) return null;
+    
+    const filter = { _id: existing._id };
     const update = this.extractEmployeeData(payload);
 
     update.ngayCapNhat = new Date();
@@ -62,9 +80,11 @@ class EmployeeService {
   }
 
   async delete(id) {
-    return await this.Employee.findOneAndDelete({
-      _id: ObjectId.isValid(id) ? new ObjectId(id) : null,
-    });
+    // Tìm document trước để lấy _id thực
+    const existing = await this.findById(id);
+    if (!existing) return null;
+    
+    return await this.Employee.findOneAndDelete({ _id: existing._id });
   }
 
   // Đăng nhập
