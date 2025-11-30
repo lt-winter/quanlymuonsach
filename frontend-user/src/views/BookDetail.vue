@@ -9,7 +9,7 @@
     <div v-else-if="book" class="row">
       <div class="col-md-4">
         <img
-          :src="book.image || '/placeholder-book.svg'"
+          :src="book.anhSach || '/placeholder-book.svg'"
           class="img-fluid rounded shadow"
           :alt="book.tenSach"
         />

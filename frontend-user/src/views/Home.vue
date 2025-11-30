@@ -5,7 +5,9 @@
       <h1 class="display-4">
         <i class="fas fa-book-reader"></i> Chào mừng đến với Thư viện
       </h1>
-      <p class="lead">Khám phá hàng ngàn đầu sách và mượn sách trực tuyến dễ dàng</p>
+      <p class="lead">
+        Khám phá hàng ngàn đầu sách và mượn sách trực tuyến dễ dàng
+      </p>
       <hr class="my-4 bg-white" />
       <router-link to="/books" class="btn btn-light btn-lg">
         <i class="fas fa-search"></i> Tìm sách ngay
@@ -61,14 +63,19 @@
       </div>
       <div v-else class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
         <div v-for="book in latestBooks" :key="book.maSach" class="col">
-          <div class="card h-100 shadow-sm" :class="{ 'out-of-stock': book.soQuyen <= 0 }">
+          <div
+            class="card h-100 shadow-sm"
+            :class="{ 'out-of-stock': book.soQuyen <= 0 }"
+          >
             <div class="position-relative">
               <img
-                :src="book.image || '/placeholder-book.svg'"
+                :src="book.anhSach || '/placeholder-book.svg'"
                 class="card-img-top"
                 style="height: 200px; object-fit: cover"
               />
-              <span v-if="book.soQuyen <= 0" class="out-of-stock-badge">Hết sách</span>
+              <span v-if="book.soQuyen <= 0" class="out-of-stock-badge"
+                >Hết sách</span
+              >
             </div>
             <div class="card-body">
               <h6 class="card-title">{{ book.tenSach }}</h6>
@@ -77,7 +84,8 @@
               </p>
               <p class="card-text small">
                 <span v-if="book.soQuyen > 0" class="text-success">
-                  <i class="fas fa-check-circle"></i> Còn {{ book.soQuyen }} quyển
+                  <i class="fas fa-check-circle"></i> Còn
+                  {{ book.soQuyen }} quyển
                 </span>
                 <span v-else class="text-danger">
                   <i class="fas fa-times-circle"></i> Hết sách

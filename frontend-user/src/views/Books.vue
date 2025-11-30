@@ -1,8 +1,6 @@
 <template>
   <div class="books-page">
-    <h2 class="mb-4">
-      <i class="fas fa-book"></i> Danh sách sách
-    </h2>
+    <h2 class="mb-4"><i class="fas fa-book"></i> Danh sách sách</h2>
 
     <!-- Search and Filter -->
     <div class="row mb-4">
@@ -53,14 +51,19 @@
 
       <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
         <div v-for="book in filteredBooks" :key="book.maSach" class="col mb-4">
-          <div class="card h-100 shadow-sm" :class="{ 'out-of-stock': book.soQuyen <= 0 }">
+          <div
+            class="card h-100 shadow-sm"
+            :class="{ 'out-of-stock': book.soQuyen <= 0 }"
+          >
             <div class="position-relative">
               <img
-                :src="book.image || '/placeholder-book.svg'"
+                :src="book.anhSach || '/placeholder-book.svg'"
                 class="card-img-top"
                 style="height: 200px; object-fit: cover"
               />
-              <span v-if="book.soQuyen <= 0" class="out-of-stock-badge">Hết sách</span>
+              <span v-if="book.soQuyen <= 0" class="out-of-stock-badge"
+                >Hết sách</span
+              >
             </div>
             <div class="card-body d-flex flex-column">
               <h6 class="card-title">{{ book.tenSach }}</h6>
@@ -68,8 +71,14 @@
                 <i class="fas fa-user"></i> {{ book.tacGia }}
               </p>
               <p class="card-text small">
-                <span :class="book.soQuyen > 0 ? 'badge badge-info' : 'badge badge-danger'">
-                  {{ book.soQuyen > 0 ? `Còn ${book.soQuyen} quyển` : 'Hết sách' }}
+                <span
+                  :class="
+                    book.soQuyen > 0 ? 'badge badge-info' : 'badge badge-danger'
+                  "
+                >
+                  {{
+                    book.soQuyen > 0 ? `Còn ${book.soQuyen} quyển` : "Hết sách"
+                  }}
                 </span>
               </p>
               <div class="mt-auto">
