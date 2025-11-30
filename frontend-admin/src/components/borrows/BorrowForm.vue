@@ -75,7 +75,8 @@
             :class="{ active: book.maSach === borrowLocal.maSach }"
             @click="() => selectBook(book, field)"
           >
-            {{ book.tenSach }} - {{ book.tacGia }}
+            {{ book.tenSach }} - {{ book.tacGia }} 
+            <span class="badge badge-info ml-2">Còn {{ book.soQuyen }} quyển</span>
           </button>
           <div
             v-if="filteredBooks.length === 0"
@@ -239,9 +240,11 @@ export default {
       );
     },
     filteredBooks() {
-      if (!this.bookSearch) return this.books;
+      // Chỉ hiển thị sách còn số lượng > 0
+      let available = this.books.filter((b) => b.soQuyen > 0);
+      if (!this.bookSearch) return available;
       const search = this.bookSearch.toLowerCase();
-      return this.books.filter((b) =>
+      return available.filter((b) =>
         `${b.tenSach} ${b.tacGia}`.toLowerCase().includes(search)
       );
     },
@@ -398,13 +401,16 @@ export default {
 }
 
 .dropdown-list {
-  max-height: 200px;
+  max-height: 300px;
   overflow-y: auto;
   z-index: 10;
+  background: white;
+  border-radius: 10px;
 }
 
 .list-group-item {
   cursor: pointer;
+  padding: 12px 16px;
 }
 
 .list-group-item.active {

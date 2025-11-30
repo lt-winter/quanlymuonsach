@@ -4,6 +4,7 @@ class BorrowService {
   constructor(client) {
     this.client = client;
     this.Borrow = client.db().collection("theodoimuonsach");
+    this.Sach = client.db().collection("sach");
     this.codeGenerator = new CodeGenerator(client);
   }
 
@@ -12,8 +13,8 @@ class BorrowService {
 
   extractBorrowData(payload) {
     const borrow = {
-      maDocGia: payload.maDocGia, // Giờ là string (DG00001)
-      maSach: payload.maSach,     // Giờ là string (SA00001)
+      maDocGia: payload.maDocGia,
+      maSach: payload.maSach,
       maNhanVien: payload.maNhanVien,
       ngayMuon: payload.ngayMuon ? new Date(payload.ngayMuon) : undefined,
       ngayTraDuKien: payload.ngayTraDuKien,
@@ -30,9 +31,18 @@ class BorrowService {
 
   // User đăng ký mượn sách (chờ duyệt)
   async borrow(maDocGia, maSach, ngayMuon) {
+    // Kiểm tra số lượng sách còn lại
+    const book = await this.Sach.findOne({ maSach: maSach });
+    if (!book) {
+      throw new Error("Sách không tồn tại");
+    }
+    if (book.soQuyen <= 0) {
+      throw new Error("Sách đã hết, không thể mượn");
+    }
+
     // Sinh mã mượn sách tự động (MS00001, MS00002, ...) - _id để MongoDB tự sinh ObjectId
     const maMuon = await this.codeGenerator.generateBorrowCode();
-    
+
     const data = {
       maMuon,
       maDocGia,
@@ -46,8 +56,15 @@ class BorrowService {
       ngayTao: new Date(),
       ngayCapNhat: new Date(),
     };
+
+    await this.Borrow.insertOne(data);
     
-    const result = await this.Borrow.insertOne(data);
+    // Trừ số lượng sách (giữ chỗ trước)
+    await this.Sach.updateOne(
+      { maSach: maSach },
+      { $inc: { soQuyen: -1 } }
+    );
+
     return data;
   }
 

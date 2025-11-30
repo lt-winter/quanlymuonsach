@@ -49,18 +49,22 @@ export default {
     <table class="borrow-table">
       <thead>
         <tr>
-          <th>Độc giả</th>
-          <th>Sách</th>
+          <th class="col-reader">Độc giả</th>
+          <th class="col-book">Sách</th>
           <th>Ngày mượn</th>
           <th>Hạn trả</th>
           <th>Ngày trả</th>
           <th>Trạng thái</th>
           <th>Phạt/Bồi thường</th>
-          <th>Thao tác</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="borrow in borrows" :key="borrow.maMuon">
+        <tr 
+          v-for="borrow in borrows" 
+          :key="borrow.maMuon"
+          class="borrow-row"
+          @click="$emit('edit', borrow)"
+        >
           <td>
             <div class="reader-info">
               <i class="fas fa-user"></i>
@@ -104,33 +108,7 @@ export default {
               <span v-if="!borrow.tienPhat && !borrow.tienBoiThuong">—</span>
             </div>
           </td>
-          <td>
-            <div class="actions">
-              <button
-                v-if="borrow.trangThai === 'dangMuon'"
-                class="action-btn return"
-                @click="$emit('return', borrow)"
-                title="Trả sách"
-              >
-                <i class="fas fa-undo"></i>
-              </button>
-              <button
-                v-if="borrow.trangThai === 'dangMuon'"
-                class="action-btn lost"
-                @click="$emit('lost', borrow)"
-                title="Báo mất"
-              >
-                <i class="fas fa-times-circle"></i>
-              </button>
-              <button
-                class="action-btn edit"
-                @click="$emit('edit', borrow)"
-                title="Chi tiết"
-              >
-                <i class="fas fa-eye"></i>
-              </button>
-            </div>
-          </td>
+
         </tr>
       </tbody>
     </table>
@@ -141,12 +119,13 @@ export default {
 .borrow-table-wrapper {
   background: white;
   border-radius: 16px;
-  overflow: hidden;
+  overflow-x: auto;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .borrow-table {
   width: 100%;
+  min-width: 1000px;
   border-collapse: collapse;
 }
 
@@ -164,25 +143,47 @@ export default {
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  white-space: nowrap;
 }
 
-.borrow-table tbody tr:hover {
-  background: #f9fafb;
+.col-reader,
+.col-book {
+  min-width: 200px;
+  width: 20%;
 }
 
 .reader-info,
 .book-info {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
+}
+
+.reader-info span,
+.book-info span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 180px;
 }
 
 .reader-info i {
   color: #4361ee;
+  flex-shrink: 0;
 }
 
 .book-info i {
   color: #06d6a0;
+  flex-shrink: 0;
+}
+
+.borrow-row {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.borrow-row:hover {
+  background: #f0f4ff;
 }
 
 .status-badge {
@@ -245,47 +246,5 @@ export default {
   color: #d97706;
 }
 
-.actions {
-  display: flex;
-  gap: 8px;
-}
 
-.action-btn {
-  width: 36px;
-  height: 36px;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.action-btn.return {
-  background: #d1fae5;
-  color: #065f46;
-}
-
-.action-btn.return:hover {
-  background: #a7f3d0;
-}
-
-.action-btn.lost {
-  background: #fee2e2;
-  color: #991b1b;
-}
-
-.action-btn.lost:hover {
-  background: #fecaca;
-}
-
-.action-btn.edit {
-  background: #e0e7ff;
-  color: #3730a3;
-}
-
-.action-btn.edit:hover {
-  background: #c7d2fe;
-}
 </style>

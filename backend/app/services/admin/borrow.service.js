@@ -52,6 +52,15 @@ class BorrowService {
 
   // Cho mượn sách (Admin tạo phiếu - ghi lại người tạo)
   async create(payload, nguoiTaoId = null) {
+    // Kiểm tra số lượng sách còn lại
+    const book = await this.Sach.findOne({ maSach: payload.maSach });
+    if (!book) {
+      throw new Error("Sách không tồn tại");
+    }
+    if (book.soQuyen <= 0) {
+      throw new Error("Sách đã hết, không thể mượn");
+    }
+
     const muonSach = this.extractBorrowData(payload);
     // Sinh mã mượn sách tự động (MS00001, MS00002, ...) - _id để MongoDB tự sinh ObjectId
     muonSach.maMuon = await this.codeGenerator.generateBorrowCode();
@@ -68,12 +77,28 @@ class BorrowService {
     }
 
     await this.TheoDoiMuonSach.insertOne(muonSach);
+    
+    // Trừ số lượng sách
+    await this.Sach.updateOne(
+      { maSach: payload.maSach },
+      { $inc: { soQuyen: -1 } }
+    );
+
     // Trả về document với đầy đủ thông tin lookup (sách, độc giả, nhân viên)
     return await this.findById(muonSach.maMuon);
   }
 
   // User mượn sách (ghi lại người duyệt khi admin duyệt)
   async createByUser(payload) {
+    // Kiểm tra số lượng sách còn lại
+    const book = await this.Sach.findOne({ maSach: payload.maSach });
+    if (!book) {
+      throw new Error("Sách không tồn tại");
+    }
+    if (book.soQuyen <= 0) {
+      throw new Error("Sách đã hết, không thể mượn");
+    }
+
     const muonSach = this.extractBorrowData(payload);
     // Sinh mã mượn sách tự động (MS00001, MS00002, ...) - _id để MongoDB tự sinh ObjectId
     muonSach.maMuon = await this.codeGenerator.generateBorrowCode();
@@ -86,6 +111,13 @@ class BorrowService {
     muonSach.nguoiDuyet = null; // Sẽ được cập nhật khi admin duyệt
 
     await this.TheoDoiMuonSach.insertOne(muonSach);
+    
+    // Trừ số lượng sách (giữ chỗ trước)
+    await this.Sach.updateOne(
+      { maSach: payload.maSach },
+      { $inc: { soQuyen: -1 } }
+    );
+
     // Trả về document với đầy đủ thông tin lookup
     return await this.findById(muonSach.maMuon);
   }
@@ -107,8 +139,12 @@ class BorrowService {
     return result;
   }
 
-  // Admin từ chối phiếu mượn
+  // Admin từ chối phiếu mượn (tăng lại số lượng sách)
   async reject(id, nguoiDuyetId, lyDo = "") {
+    // Lấy thông tin phiếu mượn để biết mã sách
+    const borrow = await this.TheoDoiMuonSach.findOne({ _id: id });
+    if (!borrow) return null;
+
     const result = await this.TheoDoiMuonSach.findOneAndUpdate(
       { _id: id },
       {
@@ -122,6 +158,15 @@ class BorrowService {
       },
       { returnDocument: "after" }
     );
+
+    // Tăng lại số lượng sách vì không mượn nữa
+    if (borrow.maSach) {
+      await this.Sach.updateOne(
+        { maSach: borrow.maSach },
+        { $inc: { soQuyen: 1 } }
+      );
+    }
+
     return result;
   }
 
@@ -268,6 +313,13 @@ class BorrowService {
       },
       { returnDocument: "after" }
     );
+    
+    // Cộng lại số lượng sách
+    await this.Sach.updateOne(
+      { maSach: borrow.maSach },
+      { $inc: { soQuyen: 1 } }
+    );
+
     return result;
   }
 
@@ -310,11 +362,19 @@ class BorrowService {
     return result;
   }
 
-  // Xóa bản ghi
+  // Xóa bản ghi (tăng lại số sách nếu đang trong trạng thái mượn)
   async delete(id) {
     // Tìm document trước để lấy _id thực
     const existing = await this.findById(id);
     if (!existing) return null;
+    
+    // Nếu đang ở trạng thái chờ duyệt hoặc đang mượn thì tăng lại số sách
+    if (existing.trangThai === "choDuyet" || existing.trangThai === "dangMuon") {
+      await this.Sach.updateOne(
+        { maSach: existing.maSach },
+        { $inc: { soQuyen: 1 } }
+      );
+    }
     
     return await this.TheoDoiMuonSach.findOneAndDelete({ _id: existing._id });
   }

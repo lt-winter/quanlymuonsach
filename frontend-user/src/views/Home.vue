@@ -61,16 +61,27 @@
       </div>
       <div v-else class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
         <div v-for="book in latestBooks" :key="book.maSach" class="col">
-          <div class="card h-100 shadow-sm">
-            <img
-              :src="book.image || '/placeholder-book.svg'"
-              class="card-img-top"
-              style="height: 200px; object-fit: cover"
-            />
+          <div class="card h-100 shadow-sm" :class="{ 'out-of-stock': book.soQuyen <= 0 }">
+            <div class="position-relative">
+              <img
+                :src="book.image || '/placeholder-book.svg'"
+                class="card-img-top"
+                style="height: 200px; object-fit: cover"
+              />
+              <span v-if="book.soQuyen <= 0" class="out-of-stock-badge">Hết sách</span>
+            </div>
             <div class="card-body">
               <h6 class="card-title">{{ book.tenSach }}</h6>
               <p class="card-text text-muted small">
                 <i class="fas fa-user"></i> {{ book.tacGia }}
+              </p>
+              <p class="card-text small">
+                <span v-if="book.soQuyen > 0" class="text-success">
+                  <i class="fas fa-check-circle"></i> Còn {{ book.soQuyen }} quyển
+                </span>
+                <span v-else class="text-danger">
+                  <i class="fas fa-times-circle"></i> Hết sách
+                </span>
               </p>
               <router-link
                 :to="{ name: 'book.detail', params: { id: book.maSach } }"
@@ -114,3 +125,21 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.out-of-stock {
+  opacity: 0.7;
+}
+
+.out-of-stock-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #dc3545;
+  color: white;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+</style>
