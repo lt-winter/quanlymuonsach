@@ -60,7 +60,7 @@ export default {
         </tr>
       </thead>
       <tbody>
-        <tr v-for="borrow in borrows" :key="borrow._id">
+        <tr v-for="borrow in borrows" :key="borrow.maMuon">
           <td>
             <div class="reader-info">
               <i class="fas fa-user"></i>
@@ -94,7 +94,10 @@ export default {
                 <i class="fas fa-exclamation-circle"></i>
                 Phạt: {{ formatCurrency(borrow.tienPhat) }}
               </span>
-              <span v-if="borrow.tienBoiThuong > 0" class="fee-item compensation">
+              <span
+                v-if="borrow.tienBoiThuong > 0"
+                class="fee-item compensation"
+              >
                 <i class="fas fa-money-bill-wave"></i>
                 Bồi thường: {{ formatCurrency(borrow.tienBoiThuong) }}
               </span>

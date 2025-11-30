@@ -52,7 +52,7 @@
       </div>
 
       <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-        <div v-for="book in filteredBooks" :key="book._id" class="col mb-4">
+        <div v-for="book in filteredBooks" :key="book.maSach" class="col mb-4">
           <div class="card h-100 shadow-sm">
             <img
               :src="book.image || '/placeholder-book.svg'"
@@ -69,7 +69,7 @@
               </p>
               <div class="mt-auto">
                 <router-link
-                  :to="{ name: 'book.detail', params: { id: book._id } }"
+                  :to="{ name: 'book.detail', params: { id: book.maSach } }"
                   class="btn btn-sm btn-primary w-100"
                 >
                   <i class="fas fa-eye"></i> Xem chi tiết

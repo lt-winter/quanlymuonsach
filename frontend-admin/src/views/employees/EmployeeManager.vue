@@ -74,7 +74,7 @@
             Chi tiết Nhân viên
           </h4>
           <router-link
-            :to="{ name: 'employees.edit', params: { id: activeEmployee._id } }"
+            :to="{ name: 'employees.edit', params: { id: activeEmployee.maNhanVien } }"
             class="edit-link"
           >
             <i class="fas fa-edit"></i>

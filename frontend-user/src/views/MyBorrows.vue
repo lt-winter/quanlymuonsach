@@ -31,13 +31,13 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(borrow, index) in borrows" :key="borrow._id">
+            <tr v-for="(borrow, index) in borrows" :key="borrow.maMuon">
               <td>{{ index + 1 }}</td>
               <td>
                 <router-link
-                  :to="{ name: 'book.detail', params: { id: borrow.book?._id } }"
+                  :to="{ name: 'book.detail', params: { id: borrow.sach?.maSach } }"
                 >
-                  {{ borrow.book?.tenSach }}
+                  {{ borrow.sach?.tenSach }}
                 </router-link>
               </td>
               <td>{{ formatDate(borrow.ngayMuon) }}</td>

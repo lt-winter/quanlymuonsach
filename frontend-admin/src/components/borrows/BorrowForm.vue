@@ -11,7 +11,12 @@
           :value="readerSearch"
           @focus="showReaderDropdown = true"
           @click.stop="showReaderDropdown = true"
-          @input="(e) => { readerSearch = e.target.value; showReaderDropdown = true; }"
+          @input="
+            (e) => {
+              readerSearch = e.target.value;
+              showReaderDropdown = true;
+            }
+          "
           :disabled="isEdit"
         />
         <div
@@ -20,15 +25,18 @@
         >
           <button
             v-for="reader in filteredReaders"
-            :key="reader._id"
+            :key="reader.maDocGia"
             type="button"
             class="list-group-item list-group-item-action"
-            :class="{ active: reader._id === borrowLocal.maDocGia }"
+            :class="{ active: reader.maDocGia === borrowLocal.maDocGia }"
             @click="() => selectReader(reader, field)"
           >
-            {{ reader.hoLot }} {{ reader.ten }} - {{ reader.dienThoai }}
+            {{ reader.maDocGia }} - {{ reader.hoLot }} {{ reader.ten }}
           </button>
-          <div v-if="filteredReaders.length === 0" class="list-group-item disabled">
+          <div
+            v-if="filteredReaders.length === 0"
+            class="list-group-item disabled"
+          >
             Không tìm thấy độc giả
           </div>
         </div>
@@ -47,7 +55,12 @@
           :value="bookSearch"
           @focus="showBookDropdown = true"
           @click.stop="showBookDropdown = true"
-          @input="(e) => { bookSearch = e.target.value; showBookDropdown = true; }"
+          @input="
+            (e) => {
+              bookSearch = e.target.value;
+              showBookDropdown = true;
+            }
+          "
           :disabled="isEdit"
         />
         <div
@@ -56,15 +69,18 @@
         >
           <button
             v-for="book in filteredBooks"
-            :key="book._id"
+            :key="book.maSach"
             type="button"
             class="list-group-item list-group-item-action"
-            :class="{ active: book._id === borrowLocal.maSach }"
+            :class="{ active: book.maSach === borrowLocal.maSach }"
             @click="() => selectBook(book, field)"
           >
             {{ book.tenSach }} - {{ book.tacGia }}
           </button>
-          <div v-if="filteredBooks.length === 0" class="list-group-item disabled">
+          <div
+            v-if="filteredBooks.length === 0"
+            class="list-group-item disabled"
+          >
             Không tìm thấy sách
           </div>
         </div>
@@ -151,12 +167,20 @@
       <button type="submit" class="btn btn-primary" v-if="!isEdit">
         <i class="fa-solid fa-floppy-disk"></i> Lưu
       </button>
-      
+
       <template v-if="isEdit && borrowLocal.trangThai === 'dangMuon'">
-        <button type="button" class="btn btn-success" @click="$emit('return:borrow')">
+        <button
+          type="button"
+          class="btn btn-success"
+          @click="$emit('return:borrow')"
+        >
           <i class="fas fa-undo"></i> Trả sách
         </button>
-        <button type="button" class="btn btn-warning" @click="$emit('lost:borrow')">
+        <button
+          type="button"
+          class="btn btn-warning"
+          @click="$emit('lost:borrow')"
+        >
           <i class="fas fa-times-circle"></i> Báo mất
         </button>
       </template>
@@ -211,7 +235,7 @@ export default {
       if (!this.readerSearch) return this.readers;
       const search = this.readerSearch.toLowerCase();
       return this.readers.filter((r) =>
-        `${r.hoLot} ${r.ten} ${r.dienThoai}`.toLowerCase().includes(search)
+        `${r.hoLot} ${r.ten} ${r.maDocGia}`.toLowerCase().includes(search)
       );
     },
     filteredBooks() {
@@ -260,14 +284,14 @@ export default {
   },
   methods: {
     selectReader(reader, field) {
-      this.borrowLocal.maDocGia = reader._id;
-      field.onChange(reader._id);
+      this.borrowLocal.maDocGia = reader.maDocGia;
+      field.onChange(reader.maDocGia);
       this.readerSearch = `${reader.hoLot} ${reader.ten}`;
       this.showReaderDropdown = false;
     },
     selectBook(book, field) {
-      this.borrowLocal.maSach = book._id;
-      field.onChange(book._id);
+      this.borrowLocal.maSach = book.maSach;
+      field.onChange(book.maSach);
       this.bookSearch = book.tenSach;
       this.showBookDropdown = false;
     },
@@ -284,20 +308,30 @@ export default {
     },
     updateSearchFields() {
       if (this.borrowLocal.docGia) {
-        this.readerSearch = `${this.borrowLocal.docGia.hoLot || ""} ${this.borrowLocal.docGia.ten || ""}`.trim();
+        this.readerSearch = `${this.borrowLocal.docGia.hoLot || ""} ${
+          this.borrowLocal.docGia.ten || ""
+        }`.trim();
       }
       if (this.borrowLocal.sach) {
         this.bookSearch = this.borrowLocal.sach.tenSach || "";
       }
       if (this.borrowLocal.ngayMuon) {
-        this.borrowLocal.ngayMuon = new Date(this.borrowLocal.ngayMuon).toISOString().split("T")[0];
+        this.borrowLocal.ngayMuon = new Date(this.borrowLocal.ngayMuon)
+          .toISOString()
+          .split("T")[0];
       }
     },
     handleClickOutside(e) {
-      if (this.$refs.readerDropdown && !this.$refs.readerDropdown.contains(e.target)) {
+      if (
+        this.$refs.readerDropdown &&
+        !this.$refs.readerDropdown.contains(e.target)
+      ) {
         this.showReaderDropdown = false;
       }
-      if (this.$refs.bookDropdown && !this.$refs.bookDropdown.contains(e.target)) {
+      if (
+        this.$refs.bookDropdown &&
+        !this.$refs.bookDropdown.contains(e.target)
+      ) {
         this.showBookDropdown = false;
       }
     },

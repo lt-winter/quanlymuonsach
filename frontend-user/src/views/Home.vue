@@ -60,7 +60,7 @@
         </div>
       </div>
       <div v-else class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-        <div v-for="book in latestBooks" :key="book._id" class="col">
+        <div v-for="book in latestBooks" :key="book.maSach" class="col">
           <div class="card h-100 shadow-sm">
             <img
               :src="book.image || '/placeholder-book.svg'"
@@ -73,7 +73,7 @@
                 <i class="fas fa-user"></i> {{ book.tacGia }}
               </p>
               <router-link
-                :to="{ name: 'book.detail', params: { id: book._id } }"
+                :to="{ name: 'book.detail', params: { id: book.maSach } }"
                 class="btn btn-sm btn-outline-primary"
               >
                 Xem chi tiết

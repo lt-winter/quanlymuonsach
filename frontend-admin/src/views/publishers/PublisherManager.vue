@@ -79,7 +79,7 @@
           <router-link
             :to="{
               name: 'publishers.edit',
-              params: { id: activePublisher._id },
+              params: { id: activePublisher.maNXB },
             }"
             class="edit-link"
           >

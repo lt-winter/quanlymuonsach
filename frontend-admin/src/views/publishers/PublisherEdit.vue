@@ -63,7 +63,7 @@ export default {
 
     async updatePublisher(data) {
       try {
-        await PublisherService.update(this.publisher._id, data);
+        await PublisherService.update(this.publisher.maNXB, data);
         this.message = "Nhà xuất bản được cập nhật thành công.";
       } catch (error) {
         console.error("Lỗi cập nhật nhà xuất bản:", error);
@@ -73,7 +73,7 @@ export default {
     async deletePublisher() {
       if (confirm("Bạn muốn xóa Nhà xuất bản này?")) {
         try {
-          await PublisherService.delete(this.publisher._id);
+          await PublisherService.delete(this.publisher.maNXB);
           alert("Xoá nhà xuất bản thành công");
           this.$router.push({ name: "publishers" });
         } catch (error) {

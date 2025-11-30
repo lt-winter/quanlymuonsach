@@ -181,7 +181,7 @@ export default {
       this.$router.push({ name: "borrows.add" });
     },
     goToEditBorrow(borrow) {
-      this.$router.push({ name: "borrows.edit", params: { id: borrow._id } });
+      this.$router.push({ name: "borrows.edit", params: { id: borrow.maMuon } });
     },
     handleReturn(borrow) {
       this.selectedBorrow = borrow;
@@ -194,7 +194,7 @@ export default {
     },
     async confirmReturn() {
       try {
-        await BorrowService.returnBook(this.selectedBorrow._id, this.returnDate);
+        await BorrowService.returnBook(this.selectedBorrow.maMuon, this.returnDate);
         this.closeReturnModal();
         this.refreshList();
       } catch (error) {
@@ -205,7 +205,7 @@ export default {
     async handleLost(borrow) {
       if (confirm(`Xác nhận báo mất sách "${borrow.sach?.tenSach}"?\nBồi thường: ${this.formatCurrency(borrow.sach?.donGia || 0)}`)) {
         try {
-          await BorrowService.reportLost(borrow._id);
+          await BorrowService.reportLost(borrow.maMuon);
           this.refreshList();
         } catch (error) {
           console.error("Lỗi khi báo mất:", error);

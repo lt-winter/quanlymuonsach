@@ -67,8 +67,9 @@ class BorrowService {
       muonSach.nguoiTao = nguoiTaoId;
     }
 
-    const result = await this.TheoDoiMuonSach.insertOne(muonSach);
-    return muonSach;
+    await this.TheoDoiMuonSach.insertOne(muonSach);
+    // Trả về document với đầy đủ thông tin lookup (sách, độc giả, nhân viên)
+    return await this.findById(muonSach.maMuon);
   }
 
   // User mượn sách (ghi lại người duyệt khi admin duyệt)
@@ -84,8 +85,9 @@ class BorrowService {
     muonSach.tienBoiThuong = 0;
     muonSach.nguoiDuyet = null; // Sẽ được cập nhật khi admin duyệt
 
-    const result = await this.TheoDoiMuonSach.insertOne(muonSach);
-    return muonSach;
+    await this.TheoDoiMuonSach.insertOne(muonSach);
+    // Trả về document với đầy đủ thông tin lookup
+    return await this.findById(muonSach.maMuon);
   }
 
   // Admin duyệt phiếu mượn (ghi lại người duyệt)

@@ -66,7 +66,7 @@ export default {
 
     async updateReader(data) {
       try {
-        await ReaderService.update(this.reader._id, data);
+        await ReaderService.update(this.reader.maDocGia, data);
         this.message = "Độc giả được cập nhật thành công.";
       } catch (error) {
         console.error("Lỗi cập nhật độc giả:", error);
@@ -76,7 +76,7 @@ export default {
     async deleteReader() {
       if (confirm("Bạn muốn xóa Độc giả này?")) {
         try {
-          await ReaderService.delete(this.reader._id);
+          await ReaderService.delete(this.reader.maDocGia);
           alert("Xoá độc giả thành công");
           this.$router.push({ name: "readers" });
         } catch (error) {

@@ -84,7 +84,7 @@ export default {
     async deleteBook() {
       if (confirm("Bạn có chắc muốn xoá sách này không?")) {
         try {
-          await BookService.delete(this.book._id);
+          await BookService.delete(this.book.maSach);
           this.$router.push({ name: "books" });
         } catch (error) {
           console.log(error);

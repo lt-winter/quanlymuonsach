@@ -67,7 +67,7 @@ export default {
 
     async updateEmployee(data) {
       try {
-        await EmployeeService.update(this.employee._id, data);
+        await EmployeeService.update(this.employee.maNhanVien, data);
         this.message = "Nhân viên được cập nhật thành công.";
       } catch (error) {
         console.error("Lỗi cập nhật nhân viên:", error);
@@ -77,7 +77,7 @@ export default {
     async deleteEmployee() {
       if (confirm("Bạn muốn xóa Nhân viên này?")) {
         try {
-          await EmployeeService.delete(this.employee._id);
+          await EmployeeService.delete(this.employee.maNhanVien);
           alert("Xoá nhân viên thành công");
           this.$router.push({ name: "employees" });
         } catch (error) {
