@@ -23,12 +23,11 @@
 
       <div class="mb-3">
         <label class="form-label">Phái</label>
-        <Field name="phai" as="select" class="form-control">
-          <option value="">-- Chọn phái --</option>
-          <option value="Nam">Nam</option>
-          <option value="Nữ">Nữ</option>
-          <option value="Khác">Khác</option>
-        </Field>
+        <CustomSelect
+          v-model="formData.phai"
+          :options="phaiOptions"
+          placeholder="-- Chọn phái --"
+        />
         <ErrorMessage name="phai" class="text-danger small" />
       </div>
 
@@ -76,15 +75,24 @@
 import { Form, Field, ErrorMessage } from "vee-validate";
 import * as Yup from "yup";
 import ReaderService from "@/services/reader.service";
+import CustomSelect from "@/components/CustomSelect.vue";
 
 export default {
-  components: { Form, Field, ErrorMessage },
+  components: { Form, Field, ErrorMessage, CustomSelect },
 
   data() {
     return {
       loading: false,
       error: "",
       success: "",
+      formData: {
+        phai: "",
+      },
+      phaiOptions: [
+        { value: "Nam", label: "Nam" },
+        { value: "Nữ", label: "Nữ" },
+        { value: "Khác", label: "Khác" },
+      ],
       schema: Yup.object({
         hoLot: Yup.string().required("Vui lòng nhập họ và tên lót").min(2),
         ten: Yup.string().required("Vui lòng nhập tên").min(2),

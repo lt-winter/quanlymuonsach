@@ -20,18 +20,20 @@
         </div>
       </div>
       <div class="col-md-3">
-        <select v-model="sortBy" class="form-control" @change="fetchBooks">
-          <option value="">Sắp xếp theo</option>
-          <option value="tenSach">Tên sách</option>
-          <option value="tacGia">Tác giả</option>
-          <option value="namXuatBan">Năm xuất bản</option>
-        </select>
+        <CustomSelect
+          v-model="sortBy"
+          :options="sortOptions"
+          placeholder="Sắp xếp theo"
+          @update:modelValue="fetchBooks"
+        />
       </div>
       <div class="col-md-3">
-        <select v-model="order" class="form-control" @change="fetchBooks">
-          <option value="asc">Tăng dần</option>
-          <option value="desc">Giảm dần</option>
-        </select>
+        <CustomSelect
+          v-model="order"
+          :options="orderOptions"
+          placeholder="Thứ tự"
+          @update:modelValue="fetchBooks"
+        />
       </div>
     </div>
 
@@ -99,8 +101,12 @@
 
 <script>
 import BookService from "@/services/book.service";
+import CustomSelect from "@/components/CustomSelect.vue";
 
 export default {
+  components: {
+    CustomSelect,
+  },
   data() {
     return {
       books: [],
@@ -108,6 +114,16 @@ export default {
       sortBy: "",
       order: "asc",
       loading: false,
+      sortOptions: [
+        { value: "", label: "Sắp xếp theo" },
+        { value: "tenSach", label: "Tên sách" },
+        { value: "tacGia", label: "Tác giả" },
+        { value: "namXuatBan", label: "Năm xuất bản" },
+      ],
+      orderOptions: [
+        { value: "asc", label: "Tăng dần" },
+        { value: "desc", label: "Giảm dần" },
+      ],
     };
   },
   computed: {
