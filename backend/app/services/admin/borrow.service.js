@@ -124,8 +124,17 @@ class BorrowService {
 
   // Admin duyệt phiếu mượn (ghi lại người duyệt)
   async approve(id, nguoiDuyetId) {
+    const { ObjectId } = require("mongodb");
+    
+    // Convert to ObjectId if valid
+    const query = ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { maMuon: id };
+    
+    // Lấy thông tin phiếu mượn để biết mã sách
+    const borrow = await this.TheoDoiMuonSach.findOne(query);
+    if (!borrow) return null;
+    
     const result = await this.TheoDoiMuonSach.findOneAndUpdate(
-      { _id: id },
+      query,
       {
         $set: {
           trangThai: "dangMuon",
@@ -136,17 +145,27 @@ class BorrowService {
       },
       { returnDocument: "after" }
     );
-    return result;
+    
+    // Giảm số lượng sách khi duyệt
+    if (borrow.maSach) {
+      await this.Sach.updateOne(
+        { maSach: borrow.maSach },
+        { $inc: { soQuyen: -1 } }
+      );
+    }
+    
+    return result?.value || result;
   }
 
-  // Admin từ chối phiếu mượn (tăng lại số lượng sách)
+  // Admin từ chối phiếu mượn
   async reject(id, nguoiDuyetId, lyDo = "") {
-    // Lấy thông tin phiếu mượn để biết mã sách
-    const borrow = await this.TheoDoiMuonSach.findOne({ _id: id });
-    if (!borrow) return null;
-
+    const { ObjectId } = require("mongodb");
+    
+    // Convert to ObjectId if valid
+    const query = ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { maMuon: id };
+    
     const result = await this.TheoDoiMuonSach.findOneAndUpdate(
-      { _id: id },
+      query,
       {
         $set: {
           trangThai: "tuChoi",
@@ -158,16 +177,8 @@ class BorrowService {
       },
       { returnDocument: "after" }
     );
-
-    // Tăng lại số lượng sách vì không mượn nữa
-    if (borrow.maSach) {
-      await this.Sach.updateOne(
-        { maSach: borrow.maSach },
-        { $inc: { soQuyen: 1 } }
-      );
-    }
-
-    return result;
+    
+    return result?.value || result;
   }
 
   // Lấy tất cả bản ghi mượn sách (join với độc giả, sách, người tạo, người duyệt)
@@ -391,8 +402,8 @@ class BorrowService {
   }
 
   // Tìm theo sách
-  async findByBook(bookId) {
-    return this.findAll({ maSach: bookId });
+  async findByBook(maSach) {
+    return this.findAll({ maSach: maSach });
   }
 
   // Tìm các sách đang mượn

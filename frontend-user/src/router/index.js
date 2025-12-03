@@ -61,6 +61,13 @@ const routes = [
         component: () => import("@/views/MyBorrows.vue"),
         meta: { requiresAuth: true },
       },
+      {
+        path: "/my-borrows/:maMuon",
+        name: "borrow.detail",
+        component: () => import("@/views/BorrowDetail.vue"),
+        meta: { requiresAuth: true },
+        props: true,
+      },
     ],
   },
 

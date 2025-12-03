@@ -59,11 +59,7 @@ class BorrowService {
 
     await this.Borrow.insertOne(data);
     
-    // Trừ số lượng sách (giữ chỗ trước)
-    await this.Sach.updateOne(
-      { maSach: maSach },
-      { $inc: { soQuyen: -1 } }
-    );
+    // Không trừ số lượng sách ở đây, chỉ trừ khi admin duyệt
 
     return data;
   }
@@ -77,7 +73,7 @@ class BorrowService {
     );
   }
 
-  // Tìm các bản ghi mượn theo độc giả
+  // Tìm các bản ghi mượn theo độc giả (dùng ObjectId)
   async findByReader(readerId) {
     const pipeline = [
       { $match: { maDocGia: readerId } },
@@ -106,9 +102,38 @@ class BorrowService {
     return await this.Borrow.aggregate(pipeline).toArray();
   }
 
+  // Tìm các bản ghi mượn theo mã độc giả (dùng cho user đăng nhập)
+  async findByReaderWithMaDocGia(maDocGia) {
+    const pipeline = [
+      { $match: { maDocGia: maDocGia } },
+      {
+        $lookup: {
+          from: "sach",
+          localField: "maSach",
+          foreignField: "maSach",
+          as: "sach",
+        },
+      },
+      { $unwind: { path: "$sach", preserveNullAndEmptyArrays: true } },
+      {
+        $addFields: {
+          ngayTraDuKien: {
+            $dateAdd: {
+              startDate: "$ngayMuon",
+              unit: "day",
+              amount: BorrowService.LOAN_PERIOD_DAYS,
+            },
+          },
+        },
+      },
+      { $sort: { ngayMuon: -1 } },
+    ];
+    return await this.Borrow.aggregate(pipeline).toArray();
+  }
+
   // Tìm các bản ghi mượn theo sách
-  async findByBook(bookId) {
-    return this.Borrow.find({ maSach: bookId }).toArray();
+  async findByBook(maSach) {
+    return this.Borrow.find({ maSach: maSach }).toArray();
   }
 
   // Tìm các bản ghi chưa trả
@@ -122,6 +147,35 @@ class BorrowService {
       ngayTra: null,
       ngayMuon: { $lt: today },
     }).toArray();
+  }
+
+  // Báo mất sách (user)
+  async reportLost(maMuon, maDocGia) {
+    // Kiểm tra phiếu mượn có thuộc về user này không
+    const borrow = await this.Borrow.findOne({ maMuon, maDocGia });
+    if (!borrow) {
+      throw new Error("Không tìm thấy phiếu mượn");
+    }
+    
+    if (borrow.trangThai === "daTraSach") {
+      throw new Error("Sách đã được trả, không thể báo mất");
+    }
+    
+    if (borrow.trangThai === "matSach") {
+      throw new Error("Sách đã được báo mất trước đó");
+    }
+
+    // Cập nhật trạng thái thành "matSach"
+    return await this.Borrow.findOneAndUpdate(
+      { maMuon, maDocGia },
+      { 
+        $set: { 
+          trangThai: "matSach",
+          ngayCapNhat: new Date()
+        } 
+      },
+      { returnDocument: "after" }
+    );
   }
 }
 

@@ -9,7 +9,9 @@ import "./assets/style.css";
 import "./assets/form.css";
 
 import router from "./router";
+import NotificationPlugin from "./plugins/notification";
 
 const app = createApp(App);
 app.use(router);
+app.use(NotificationPlugin);
 app.mount("#app");

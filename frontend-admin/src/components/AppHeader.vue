@@ -30,6 +30,12 @@
           <span>Mượn sách</span>
         </router-link>
       </li>
+      <li class="nav-item">
+        <router-link :to="{ name: 'borrows.approval' }" class="nav-link nav-link-custom">
+          <i class="fas fa-check-circle"></i>
+          <span>Duyệt phiếu</span>
+        </router-link>
+      </li>
 
       <li class="nav-item" v-if="user && user.role === 'superadmin'">
         <span class="nav-divider"></span>

@@ -232,6 +232,45 @@ exports.register = async (req, res, next) => {
   }
 };
 
+exports.getProfile = async (req, res, next) => {
+  try {
+    const readerService = new ReaderService(MongoDB.client);
+    const profile = await readerService.getProfile(req.user.id);
+
+    if (!profile) {
+      return next(new ApiError(404, "Không tìm thấy thông tin độc giả"));
+    }
+
+    return res.send(profile);
+  } catch (error) {
+    console.error(error);
+    return next(new ApiError(500, "Lỗi khi lấy thông tin profile"));
+  }
+};
+
+exports.updateProfile = async (req, res, next) => {
+  if (Object.keys(req.body).length === 0) {
+    return next(new ApiError(400, "Dữ liệu cập nhật không được để trống"));
+  }
+
+  try {
+    const readerService = new ReaderService(MongoDB.client);
+    const updatedProfile = await readerService.updateProfile(req.user.id, req.body);
+
+    if (!updatedProfile) {
+      return next(new ApiError(404, "Không tìm thấy thông tin độc giả"));
+    }
+
+    return res.send({
+      message: "Cập nhật thông tin thành công",
+      data: updatedProfile,
+    });
+  } catch (error) {
+    console.error(error);
+    return next(new ApiError(500, "Lỗi khi cập nhật profile"));
+  }
+};
+
 // exports.findAllFavorite = async (req, res, next) => {
 //   try {
 //     const readerService = new ReaderService(MongoDB.client);

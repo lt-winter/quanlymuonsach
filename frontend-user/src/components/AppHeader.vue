@@ -7,21 +7,51 @@
 
     <ul class="navbar-nav mx-auto nav-menu">
       <li class="nav-item">
-        <router-link :to="{ name: 'home' }" class="nav-link nav-link-custom">
-          <i class="fas fa-home"></i>
-          <span>Trang chủ</span>
+        <router-link 
+          :to="{ name: 'home' }" 
+          custom
+          v-slot="{ navigate }"
+        >
+          <a
+            @click="navigate"
+            class="nav-link nav-link-custom"
+            :class="{ 'active-link': $route.name === 'home' }"
+          >
+            <i class="fas fa-home"></i>
+            <span>Trang chủ</span>
+          </a>
         </router-link>
       </li>
       <li class="nav-item">
-        <router-link :to="{ name: 'books' }" class="nav-link nav-link-custom">
-          <i class="fas fa-book"></i>
-          <span>Sách</span>
+        <router-link 
+          :to="{ name: 'books' }" 
+          custom
+          v-slot="{ navigate }"
+        >
+          <a
+            @click="navigate"
+            class="nav-link nav-link-custom"
+            :class="{ 'active-link': $route.name === 'books' || $route.name === 'book.detail' }"
+          >
+            <i class="fas fa-book"></i>
+            <span>Sách</span>
+          </a>
         </router-link>
       </li>
       <li class="nav-item" v-if="user">
-        <router-link :to="{ name: 'my-borrows' }" class="nav-link nav-link-custom">
-          <i class="fas fa-clipboard-list"></i>
-          <span>Sách đã mượn</span>
+        <router-link 
+          :to="{ name: 'my-borrows' }" 
+          custom
+          v-slot="{ navigate }"
+        >
+          <a
+            @click="navigate"
+            class="nav-link nav-link-custom"
+            :class="{ 'active-link': $route.name === 'my-borrows' }"
+          >
+            <i class="fas fa-clipboard-list"></i>
+            <span>Sách đã mượn</span>
+          </a>
         </router-link>
       </li>
     </ul>
@@ -153,7 +183,7 @@ export default {
   color: #ffffff !important;
 }
 
-.nav-link-custom.router-link-active {
+.nav-link-custom.active-link {
   background: linear-gradient(135deg, #4361ee, #7209b7);
   color: #ffffff !important;
 }

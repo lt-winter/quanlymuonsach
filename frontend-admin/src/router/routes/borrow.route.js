@@ -7,6 +7,11 @@ export default [
     component: BorrowManager,
   },
   {
+    path: "/borrows/approval",
+    name: "borrows.approval",
+    component: () => import("@/views/borrows/BorrowApproval.vue"),
+  },
+  {
     path: "/borrows/add",
     name: "borrows.add",
     component: () => import("@/views/borrows/BorrowAdd.vue"),

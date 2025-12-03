@@ -1,4 +1,4 @@
-const BorrowService = require("../services/admin/borrow.service");
+const BorrowService = require("../services/borrow.service");
 const MongoDB = require("../utils/mongodb.util");
 const ApiError = require("../api-error");
 
@@ -25,7 +25,12 @@ exports.findAll = async (req, res, next) => {
 
 exports.borrowBook = async (req, res, next) => {
   if (!req.body?.maDocGia || !req.body?.maSach || !req.body?.ngayMuon) {
-    return next(new ApiError(400, "Thiếu thông tin mượn sách"));
+    return next(
+      new ApiError(
+        400,
+        "Thiếu thông tin mượn sách " + JSON.stringify(req.body),
+      ),
+    );
   }
   try {
     const borrowService = new BorrowService(MongoDB.client);
@@ -70,12 +75,12 @@ exports.findBorrowsByReader = async (req, res, next) => {
 };
 
 exports.findBorrowsByBook = async (req, res, next) => {
-  if (!req.params?.bookId) {
+  if (!req.params?.maSach) {
     return next(new ApiError(400, "Thiếu thông tin sách"));
   }
   try {
     const borrowService = new BorrowService(MongoDB.client);
-    const records = await borrowService.findByBook(req.params.bookId);
+    const records = await borrowService.findByBook(req.params.maSach);
     return res.send(records);
   } catch (error) {
     return next(new ApiError(500, "Lỗi khi tìm bản ghi mượn theo sách"));
@@ -100,5 +105,37 @@ exports.findOverdueBorrows = async (req, res, next) => {
     return res.send(records);
   } catch (error) {
     return next(new ApiError(500, "Lỗi khi tìm bản ghi quá hạn"));
+  }
+};
+
+exports.getMyBorrows = async (req, res, next) => {
+  try {
+    const borrowService = new BorrowService(MongoDB.client);
+    // req.user.maDocGia được set từ JWT token
+    const records = await borrowService.findByReaderWithMaDocGia(
+      req.user.maDocGia,
+    );
+    return res.send(records);
+  } catch (error) {
+    console.error("Error in getMyBorrows:", error);
+    return next(
+      new ApiError(500, "Lỗi khi lấy danh sách sách đã mượn: " + error.message),
+    );
+  }
+};
+
+exports.reportLost = async (req, res, next) => {
+  if (!req.params?.maMuon) {
+    return next(new ApiError(400, "Thiếu mã phiếu mượn"));
+  }
+  try {
+    const borrowService = new BorrowService(MongoDB.client);
+    const updatedRecord = await borrowService.reportLost(
+      req.params.maMuon,
+      req.user.maDocGia,
+    );
+    return res.send(updatedRecord);
+  } catch (error) {
+    return next(new ApiError(500, error.message || "Lỗi khi báo mất sách"));
   }
 };

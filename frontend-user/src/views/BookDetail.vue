@@ -51,7 +51,10 @@
             @click="borrowBook"
             :disabled="borrowing"
           >
-            <span v-if="borrowing" class="spinner-border spinner-border-sm"></span>
+            <span
+              v-if="borrowing"
+              class="spinner-border spinner-border-sm"
+            ></span>
             <i v-else class="fas fa-hand-holding"></i> Mượn sách này
           </button>
           <router-link
@@ -115,8 +118,9 @@ export default {
       this.borrowing = true;
       this.message = "";
       try {
-        await BorrowService.borrow(this.id);
-        this.message = "Mượn sách thành công! Vui lòng đến thư viện để nhận sách.";
+        await BorrowService.borrow(this.id, this.user.maDocGia, new Date().toISOString());
+        this.message =
+          "Mượn sách thành công! Vui lòng đến thư viện để nhận sách.";
         this.book.soQuyen--;
       } catch (error) {
         console.error("Error borrowing book:", error);

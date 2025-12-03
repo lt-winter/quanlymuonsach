@@ -123,6 +123,50 @@ class ReaderService {
 
     return await this.create(payload);
   }
+
+  async getProfile(userId) {
+    const { ObjectId } = require("mongodb");
+    const reader = await this.DocGia.findOne({ _id: new ObjectId(userId) });
+    if (!reader) return null;
+
+    // Không trả về mật khẩu
+    const { matKhau: _, ...readerWithoutPassword } = reader;
+    return readerWithoutPassword;
+  }
+
+  async updateProfile(userId, payload) {
+    const { ObjectId } = require("mongodb");
+    const filter = { _id: new ObjectId(userId) };
+    
+    // Chỉ cho phép cập nhật một số trường nhất định
+    const allowedFields = ['hoLot', 'ten', 'ngaySinh', 'phai', 'diaChi', 'dienThoai'];
+    const update = {};
+    
+    allowedFields.forEach(field => {
+      if (payload[field] !== undefined) {
+        update[field] = field === 'ngaySinh' ? new Date(payload[field]) : payload[field];
+      }
+    });
+
+    // Nếu có mật khẩu mới, hash nó
+    if (payload.matKhau) {
+      update.matKhau = await bcrypt.hash(payload.matKhau, 10);
+    }
+
+    update.ngayCapNhat = new Date();
+
+    const result = await this.DocGia.findOneAndUpdate(
+      filter,
+      { $set: update },
+      { returnDocument: "after" }
+    );
+
+    if (!result) return null;
+
+    // Không trả về mật khẩu
+    const { matKhau: _, ...readerWithoutPassword } = result;
+    return readerWithoutPassword;
+  }
 }
 
 module.exports = ReaderService;

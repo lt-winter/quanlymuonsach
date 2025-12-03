@@ -40,6 +40,14 @@ class BorrowService {
   async getStats() {
     return (await this.api.get("/stats")).data;
   }
+
+  async approve(id, data = {}) {
+    return (await this.api.post(`/${id}/approve`, data)).data;
+  }
+
+  async reject(id, data = {}) {
+    return (await this.api.post(`/${id}/reject`, data)).data;
+  }
 }
 
 export default new BorrowService();
