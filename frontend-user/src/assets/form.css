@@ -1,8 +1,146 @@
-label {
-    display: block;
-    margin-top: 10px;
+/* ===== CSS Variables ===== */
+:root {
+    --primary-color: #4361ee;
+    --primary-dark: #3651d4;
+    --secondary-color: #7209b7;
+    --success-color: #06d6a0;
+    --danger-color: #ef476f;
+    --warning-color: #ffd166;
+    --info-color: #118ab2;
+    --light-bg: #f8f9fa;
+    --dark-bg: #1a1a2e;
+    --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --card-shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --border-radius: 12px;
+    --transition: all 0.3s ease;
 }
 
+/* ===== Form Styles ===== */
+label {
+    display: block;
+    margin-top: 12px;
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.9rem;
+    margin-bottom: 6px;
+}
+
+.form-control {
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    transition: var(--transition);
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+}
+
+.form-group {
+    margin-bottom: 1rem;
+}
+
+/* ===== Card Styles ===== */
+.card-container.card {
+    max-width: 450px !important;
+    padding: 40px;
+}
+
+.card {
+    background-color: #ffffff;
+    padding: 24px;
+    margin: 0 auto 25px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--card-shadow);
+    border: 1px solid #e5e7eb;
+    transition: var(--transition);
+}
+
+.card:hover {
+    box-shadow: var(--card-shadow-hover);
+    transform: translateY(-2px);
+}
+
+.profile-img-card {
+    width: 96px;
+    height: 96px;
+    margin: 0 auto 10px;
+    display: block;
+    border-radius: 50%;
+    border: 3px solid var(--primary-color);
+}
+
+/* ===== Error Feedback ===== */
 .error-feedback {
-    color: red;
+    color: var(--danger-color);
+    font-size: 0.85rem;
+    margin-top: 4px;
+    display: block;
+}
+
+/* ===== Button Styles ===== */
+.btn {
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: 500;
+    transition: var(--transition);
+    border: none;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    color: white;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, var(--primary-dark), #5c0d99);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(67, 97, 238, 0.4);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, var(--success-color), #05b384);
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #05b384, #049a72);
+    transform: translateY(-1px);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, var(--danger-color), #dc3856);
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #dc3856, #c82d49);
+    transform: translateY(-1px);
+}
+
+/* ===== Badge Styles ===== */
+.badge {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 0.85rem;
+}
+
+.badge-warning {
+    background: linear-gradient(135deg, var(--warning-color), #f5c542);
+    color: #1f2937;
+}
+
+/* ===== Page Title ===== */
+.page-title {
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.page-title i {
+    color: var(--primary-color);
 }

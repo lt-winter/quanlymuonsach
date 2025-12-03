@@ -1,7 +1,11 @@
 const express = require("express");
-const readers = require("@/controllers/admin/reader.controller");
+const readers = require("@/controllers/reader.controller");
 
 const router = express.Router();
+
+// Public routes
+router.post("/login", readers.login);
+router.post("/register", readers.register);
 
 router
   .route("/")

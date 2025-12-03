@@ -4,15 +4,15 @@
 
     <Form :validation-schema="schema" @submit="handleLogin">
       <div class="mb-3">
-        <label class="form-label">Số điện thoại</label>
-        <Field name="dienThoai" class="form-control" />
-        <ErrorMessage name="dienThoai" class="text-danger small" />
+        <label class="form-label">Mã độc giả</label>
+        <Field name="maDocGia" class="form-control" />
+        <ErrorMessage name="maDocGia" class="error-feedback" />
       </div>
 
       <div class="mb-3">
         <label>Mật khẩu</label>
-        <Field name="password" type="password" class="form-control" />
-        <ErrorMessage name="password" class="text-danger small" />
+        <Field name="matKhau" type="password" class="form-control" />
+        <ErrorMessage name="matKhau" class="error-feedback" />
       </div>
 
       <button class="btn btn-primary w-100" :disabled="loading">
@@ -21,7 +21,7 @@
       </button>
     </Form>
 
-    <p class="text-danger text-center mt-2">{{ error }}</p>
+    <p class="error-feedback text-center mt-2">{{ error }}</p>
 
     <p class="text-center mt-3">
       Chưa có tài khoản?
@@ -43,8 +43,8 @@ export default {
       loading: false,
       error: "",
       schema: Yup.object({
-        dienThoai: Yup.string().required("Vui lòng nhập số điện thoại"),
-        password: Yup.string().required("Vui lòng nhập mật khẩu"),
+        maDocGia: Yup.string().required("Vui lòng nhập mã độc giả"),
+        matKhau: Yup.string().required("Vui lòng nhập mật khẩu"),
       }),
     };
   },
@@ -58,7 +58,7 @@ export default {
         const res = await ReaderService.login(values);
 
         if (!res || !res.user) {
-          this.error = res?.message || "Sai số điện thoại hoặc mật khẩu";
+          this.error = res?.message || "Sai mã độc giả hoặc mật khẩu";
           return;
         }
 

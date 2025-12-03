@@ -1,4 +1,5 @@
 const CodeGenerator = require("@/utils/codeGenerator.util");
+const bcrypt = require("bcryptjs");
 
 class ReaderService {
   constructor(client) {
@@ -16,6 +17,7 @@ class ReaderService {
       phai: payload.phai,
       diaChi: payload.diaChi,
       dienThoai: payload.dienThoai,
+      matKhau: payload.matKhau,
     };
     Object.keys(docGia).forEach(
       (key) => docGia[key] === undefined && delete docGia[key],
@@ -30,6 +32,11 @@ class ReaderService {
     docGia.maDocGia = code;
     docGia.ngayTao = new Date();
     docGia.ngayCapNhat = new Date();
+
+    // Hash mật khẩu nếu có
+    if (payload.matKhau) {
+      docGia.matKhau = await bcrypt.hash(payload.matKhau, 10);
+    }
 
     const result = await this.DocGia.insertOne(docGia);
     return result;
@@ -93,6 +100,28 @@ class ReaderService {
   async deleteAll() {
     const result = await this.DocGia.deleteMany({});
     return result.deletedCount;
+  }
+
+  async login(maDocGia, matKhau) {
+    const reader = await this.DocGia.findOne({ maDocGia });
+    if (!reader) return null;
+
+    const isMatch = await bcrypt.compare(matKhau, reader.matKhau);
+    if (!isMatch) return null;
+
+    // Không trả về mật khẩu
+    const { matKhau: _, ...readerWithoutPassword } = reader;
+    return readerWithoutPassword;
+  }
+
+  async register(payload) {
+    // Kiểm tra xem số điện thoại đã tồn tại chưa
+    const existing = await this.DocGia.findOne({ dienThoai: payload.dienThoai });
+    if (existing) {
+      throw new Error("Số điện thoại đã được đăng ký");
+    }
+
+    return await this.create(payload);
   }
 }
 

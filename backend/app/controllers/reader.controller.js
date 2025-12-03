@@ -1,6 +1,7 @@
-const ReaderService = require("@/services/admin/reader.service");
+const ReaderService = require("@/services/reader.service");
 const MongoDB = require("@/utils/mongodb.util");
 const ApiError = require("@/api-error");
+const jwt = require("jsonwebtoken");
 
 exports.create = async (req, res, next) => {
   if (!req.body?.hoLot) {
@@ -122,6 +123,112 @@ exports.deleteAll = async (req, res, next) => {
     });
   } catch (error) {
     return next(new ApiError(500, `Lỗi khi xóa tất cả độc giả`));
+  }
+};
+
+exports.login = async (req, res, next) => {
+  try {
+    const { maDocGia, matKhau } = req.body;
+
+    if (!maDocGia || !matKhau) {
+      return next(new ApiError(400, "Vui lòng nhập mã độc giả và mật khẩu"));
+    }
+
+    const readerService = new ReaderService(MongoDB.client);
+    const user = await readerService.login(maDocGia, matKhau);
+
+    if (!user) {
+      return next(new ApiError(401, "Sai mã độc giả hoặc mật khẩu"));
+    }
+
+    // Tạo token
+    const token = jwt.sign(
+      {
+        id: user._id,
+        maDocGia: user.maDocGia,
+      },
+      process.env.JWT_SECRET || "secret-key",
+      { expiresIn: "7d" },
+    );
+
+    return res.send({
+      message: "Đăng nhập thành công",
+      user: {
+        _id: user._id,
+        maDocGia: user.maDocGia,
+        hoLot: user.hoLot,
+        ten: user.ten,
+        dienThoai: user.dienThoai,
+        diaChi: user.diaChi,
+        phai: user.phai,
+        ngaySinh: user.ngaySinh,
+      },
+      token,
+    });
+  } catch (error) {
+    console.error(error);
+    return next(new ApiError(500, "Lỗi khi đăng nhập"));
+  }
+};
+
+exports.register = async (req, res, next) => {
+  if (!req.body?.hoLot) {
+    return next(new ApiError(400, "Họ lót không được để trống"));
+  }
+  if (!req.body?.ten) {
+    return next(new ApiError(400, "Tên không được để trống"));
+  }
+  if (!req.body?.ngaySinh) {
+    return next(new ApiError(400, "Ngày sinh không được để trống"));
+  }
+  if (!req.body?.phai) {
+    return next(new ApiError(400, "Phái không được để trống"));
+  }
+  if (!req.body?.diaChi) {
+    return next(new ApiError(400, "Địa chỉ không được để trống"));
+  }
+  if (!req.body?.dienThoai) {
+    return next(new ApiError(400, "Số điện thoại không được để trống"));
+  }
+  if (!req.body?.matKhau) {
+    return next(new ApiError(400, "Mật khẩu không được để trống"));
+  }
+
+  try {
+    const readerService = new ReaderService(MongoDB.client);
+    const result = await readerService.register(req.body);
+    
+    // Lấy thông tin độc giả vừa tạo
+    const newReader = await readerService.findById(result.insertedId);
+
+    // Tạo token
+    const token = jwt.sign(
+      {
+        id: newReader._id,
+        maDocGia: newReader.maDocGia,
+      },
+      process.env.JWT_SECRET || "secret-key",
+      { expiresIn: "7d" },
+    );
+
+    return res.send({
+      message: "Đăng ký thành công",
+      user: {
+        _id: newReader._id,
+        maDocGia: newReader.maDocGia,
+        hoLot: newReader.hoLot,
+        ten: newReader.ten,
+        dienThoai: newReader.dienThoai,
+        diaChi: newReader.diaChi,
+        phai: newReader.phai,
+        ngaySinh: newReader.ngaySinh,
+      },
+      token,
+    });
+  } catch (error) {
+    return next(
+      new ApiError(500, `Có lỗi xảy ra khi đăng ký: ${error.message}`),
+    );
   }
 };
 
