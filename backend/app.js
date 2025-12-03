@@ -35,6 +35,10 @@ app.use("/api/books", bookRoutes);
 app.use("/api/borrows", borrowRoutes);
 // app.use("/api/employees", employeeRoutes);
 
+// Admin login - không cần auth
+const employeeController = require("./app/controllers/admin/employee.controller");
+app.post("/api/admin/employees/login", employeeController.login);
+
 // Admin routes with auth
 app.use("/api/admin/readers", auth, superadmin, readerAdminRoutes);
 app.use("/api/admin/publishers", auth, superadmin, publisherAdminRoutes);
