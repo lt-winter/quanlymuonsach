@@ -19,7 +19,7 @@
         <hr />
         <table class="table table-borderless">
           <tr>
-            <th style="width: 150px"><i class="fas fa-user"></i> Tác giả:</th>
+            <th style="width: 200px"><i class="fas fa-user"></i> Tác giả:</th>
             <td>{{ book.tacGia }}</td>
           </tr>
           <tr>
@@ -118,7 +118,11 @@ export default {
       this.borrowing = true;
       this.message = "";
       try {
-        await BorrowService.borrow(this.id, this.user.maDocGia, new Date().toISOString());
+        await BorrowService.borrow(
+          this.id,
+          this.user.maDocGia,
+          new Date().toISOString()
+        );
         this.message =
           "Mượn sách thành công! Vui lòng đến thư viện để nhận sách.";
         this.book.soQuyen--;
