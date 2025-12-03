@@ -15,7 +15,7 @@ export default {
 
 <template>
   <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-    <div v-for="book in books" :key="book.maSach" class="col">
+    <div v-for="book in books" :key="book.maSach" class="col mb-4">
       <router-link
         :to="{ name: 'books.edit', params: { id: book.maSach } }"
         custom
@@ -41,6 +41,21 @@ export default {
               <i class="fas fa-pen-fancy"></i>
               {{ book.tacGia || "Đang cập nhật" }}
             </p>
+            
+            <!-- Thể loại -->
+            <div class="book-genres" v-if="book.theLoai && book.theLoai.length > 0">
+              <span
+                v-for="genre in book.theLoai.slice(0, 2)"
+                :key="genre"
+                class="genre-badge"
+              >
+                {{ genre }}
+              </span>
+              <span v-if="book.theLoai.length > 2" class="genre-more">
+                +{{ book.theLoai.length - 2 }}
+              </span>
+            </div>
+            
             <div class="book-meta">
               <span class="book-price" v-if="book.donGia">
                 {{ new Intl.NumberFormat("vi-VN").format(book.donGia) }}đ
@@ -145,11 +160,40 @@ export default {
   display: flex;
   align-items: center;
   gap: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .book-author i {
   color: #9ca3af;
   font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.book-genres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.genre-badge {
+  font-size: 0.7rem;
+  padding: 3px 8px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+.genre-more {
+  font-size: 0.7rem;
+  padding: 3px 8px;
+  background: #e5e7eb;
+  color: #6b7280;
+  border-radius: 12px;
+  font-weight: 600;
 }
 
 .book-meta {

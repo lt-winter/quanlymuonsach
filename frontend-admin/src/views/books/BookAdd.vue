@@ -39,6 +39,7 @@ export default {
         namXuatBan: "",
         maNXB: "",
         tacGia: "",
+        theLoai: [],
       },
       message: "",
     };

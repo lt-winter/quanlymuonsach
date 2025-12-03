@@ -11,6 +11,20 @@ export default (baseURL) => {
   const instance = axios.create({
     baseURL,
     ...commonConfig,
+    paramsSerializer: {
+      serialize: (params) => {
+        const searchParams = new URLSearchParams();
+        Object.keys(params).forEach((key) => {
+          const value = params[key];
+          if (Array.isArray(value)) {
+            value.forEach((item) => searchParams.append(key, item));
+          } else if (value !== undefined && value !== null) {
+            searchParams.append(key, value);
+          }
+        });
+        return searchParams.toString();
+      }
+    }
   });
 
   instance.interceptors.request.use((config) => {

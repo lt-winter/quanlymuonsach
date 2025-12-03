@@ -18,11 +18,20 @@ exports.create = async (req, res, next) => {
 };
 
 exports.findAll = async (req, res, next) => {
-  const { sortBy, order } = req.query;
+  const { sortBy, order, theLoai } = req.query;
   let documents = [];
   try {
     const bookService = new BookService(MongoDB.client);
     const { name } = req.query;
+    
+    // Tạo filter object
+    const filter = {};
+    
+    // Filter theo thể loại nếu có
+    if (theLoai) {
+      filter.theLoai = theLoai;
+    }
+    
     if (name) {
       documents = await bookService.findByName(name);
     } else {
@@ -33,7 +42,7 @@ exports.findAll = async (req, res, next) => {
         const sortOrder = order === "desc" ? -1 : 1;
         sort[sortBy] = sortOrder;
       }
-      documents = await bookService.find({}, sort);
+      documents = await bookService.find(filter, sort);
     }
   } catch (error) {
     return next(

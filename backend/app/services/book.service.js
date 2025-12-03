@@ -13,6 +13,7 @@ class BookService {
       tacGia: payload.tacGia,
       anhSach: payload.anhSach,
       moTa: payload.moTa,
+      theLoai: payload.theLoai || [], // Array thể loại
     };
     Object.keys(sach).forEach(
       (key) => sach[key] === undefined && delete sach[key],
@@ -22,6 +23,18 @@ class BookService {
 
   async find(filter, sort = {}) {
     const cursor = await this.Sach.find(filter).sort(sort);
+    return await cursor.toArray();
+  }
+
+  async count(filter = {}) {
+    return await this.Sach.countDocuments(filter);
+  }
+
+  async findWithPagination(filter, sort = {}, skip = 0, limit = 20) {
+    const cursor = await this.Sach.find(filter)
+      .sort(sort)
+      .skip(skip)
+      .limit(limit);
     return await cursor.toArray();
   }
 
@@ -58,6 +71,12 @@ class BookService {
     }
     
     return doc;
+  }
+
+  async getDistinctGenres() {
+    // Lấy tất cả genres duy nhất từ collection sách
+    const genres = await this.Sach.distinct("theLoai", { theLoai: { $exists: true, $ne: [] } });
+    return genres.sort();
   }
 }
 

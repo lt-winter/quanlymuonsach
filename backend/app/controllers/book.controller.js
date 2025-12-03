@@ -3,29 +3,111 @@ const MongoDB = require("@/utils/mongodb.util");
 const ApiError = require("@/api-error");
 
 exports.findAll = async (req, res, next) => {
-  const { sortBy, order } = req.query;
-  let documents = [];
+  const { sortBy, order, theLoai, page, limit, name } = req.query;
+  
+  console.log('findAll - Query params:', { sortBy, order, theLoai, page, limit, name });
+  
   try {
     const bookService = new BookService(MongoDB.client);
-    const { name } = req.query;
-    if (name) {
-      documents = await bookService.findByName(name);
-    } else {
-      const sort = {};
-      if (!sortBy) {
-        sort["_id"] = order === "desc" ? -1 : 1;
-      } else {
-        const sortOrder = order === "desc" ? -1 : 1;
-        sort[sortBy] = sortOrder;
+    
+    // Tạo filter object
+    const filter = {};
+    
+    // Filter theo thể loại nếu có (hỗ trợ nhiều thể loại)
+    if (theLoai) {
+      const genres = Array.isArray(theLoai) ? theLoai : [theLoai];
+      if (genres.length > 0) {
+        filter.theLoai = { $all: genres }; // Phải có tất cả thể loại
       }
-      documents = await bookService.find({}, sort);
     }
+    
+    // Filter theo tên nếu có
+    if (name) {
+      filter.$or = [
+        { tenSach: { $regex: name, $options: 'i' } },
+        { tacGia: { $regex: name, $options: 'i' } }
+      ];
+    }
+    
+    console.log('Filter:', JSON.stringify(filter));
+    
+    // Sắp xếp
+    const sort = {};
+    if (sortBy) {
+      const sortOrder = order === "desc" ? -1 : 1;
+      sort[sortBy] = sortOrder;
+    }
+    // Nếu không có sortBy, không sắp xếp (giữ thứ tự mặc định)
+    
+    // Phân trang
+    const pageNum = parseInt(page) || 1;
+    const limitNum = parseInt(limit) || 20;
+    const skip = (pageNum - 1) * limitNum;
+    
+    // Lấy tổng số sách và danh sách sách
+    const total = await bookService.count(filter);
+    const documents = await bookService.findWithPagination(filter, sort, skip, limitNum);
+    
+    // Trả về kết quả với thông tin phân trang
+    return res.send({
+      data: documents,
+      pagination: {
+        total,
+        page: pageNum,
+        limit: limitNum,
+        totalPages: Math.ceil(total / limitNum)
+      }
+    });
   } catch (error) {
     return next(
       new ApiError(500, `Đã xảy ra lỗi khi truy xuất sách: ${error.message}`),
     );
   }
-  return res.send(documents);
+};
+
+exports.getNewestBooks = async (req, res, next) => {
+  const { limit } = req.query;
+  
+  try {
+    const bookService = new BookService(MongoDB.client);
+    
+    // Sắp xếp theo _id giảm dần (sách mới nhất đầu tiên)
+    const sort = { _id: -1 };
+    const limitNum = parseInt(limit) || 8;
+    
+    // Lấy sách mới nhất
+    const documents = await bookService.findWithPagination({}, sort, 0, limitNum);
+    
+    return res.send({
+      data: documents,
+      pagination: {
+        total: documents.length,
+        limit: limitNum,
+        count: documents.length
+      }
+    });
+  } catch (error) {
+    return next(
+      new ApiError(500, `Đã xảy ra lỗi khi truy xuất sách mới nhất: ${error.message}`),
+    );
+  }
+};
+
+exports.getGenres = async (req, res, next) => {
+  try {
+    const bookService = new BookService(MongoDB.client);
+    
+    // Lấy tất cả genres duy nhất từ tất cả sách
+    const genres = await bookService.getDistinctGenres();
+    
+    return res.send({
+      data: genres
+    });
+  } catch (error) {
+    return next(
+      new ApiError(500, `Đã xảy ra lỗi khi truy xuất thể loại: ${error.message}`),
+    );
+  }
 };
 
 exports.findOne = async (req, res, next) => {

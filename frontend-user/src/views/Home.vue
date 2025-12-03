@@ -6,9 +6,7 @@
         <div class="hero-icon">
           <i class="fas fa-book-reader"></i>
         </div>
-        <h1 class="hero-title">
-          Chào mừng đến với Thư viện
-        </h1>
+        <h1 class="hero-title">Chào mừng đến với Thư viện</h1>
         <p class="hero-subtitle">
           Khám phá hàng ngàn đầu sách và mượn sách trực tuyến dễ dàng
         </p>
@@ -118,7 +116,7 @@
         </div>
       </div>
       <div v-else class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
-        <div v-for="book in latestBooks" :key="book.maSach" class="col">
+        <div v-for="book in latestBooks" :key="book.maSach" class="col mb-4">
           <router-link
             :to="{ name: 'book.detail', params: { id: book.maSach } }"
             custom
@@ -182,36 +180,48 @@ export default {
   },
   methods: {
     animateNumbers() {
-      const stats = document.querySelectorAll('.stat-number');
-      stats.forEach(stat => {
-        const target = parseInt(stat.getAttribute('data-target'));
+      const stats = document.querySelectorAll(".stat-number");
+      stats.forEach((stat) => {
+        const target = parseInt(stat.getAttribute("data-target"));
         const increment = target / 50;
         let current = 0;
-        
+
         const updateNumber = () => {
           current += increment;
           if (current < target) {
             stat.textContent = Math.floor(current);
             setTimeout(updateNumber, 30);
           } else {
-            stat.textContent = target + (stat.parentElement.querySelector('.stat-label').textContent.includes('5⭐') ? '%' : '+');
+            stat.textContent =
+              target +
+              (stat.parentElement
+                .querySelector(".stat-label")
+                .textContent.includes("5⭐")
+                ? "%"
+                : "+");
           }
         };
         updateNumber();
       });
-    }
+    },
   },
   async mounted() {
     this.loading = true;
     try {
-      const books = await BookService.getAll({ limit: 8 });
-      this.latestBooks = books;
+      const response = await BookService.getNewestBooks({ limit: 8 });
+      // Xử lý response format mới
+      if (response.data && Array.isArray(response.data)) {
+        this.latestBooks = response.data;
+      } else if (Array.isArray(response)) {
+        // Fallback nếu backend chưa cập nhật
+        this.latestBooks = response;
+      }
     } catch (error) {
-      console.error("Error fetching books:", error);
+      console.error("Error fetching newest books:", error);
     } finally {
       this.loading = false;
     }
-    
+
     // Animate numbers when page loads
     setTimeout(() => {
       this.animateNumbers();
@@ -382,7 +392,11 @@ export default {
 .feature-icon {
   font-size: 3.5rem;
   margin-bottom: 20px;
-  background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -438,7 +452,11 @@ export default {
 .book-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(67, 97, 238, 0.9), rgba(114, 9, 183, 0.9));
+  background: linear-gradient(
+    135deg,
+    rgba(67, 97, 238, 0.9),
+    rgba(114, 9, 183, 0.9)
+  );
   display: flex;
   align-items: center;
   justify-content: center;
@@ -536,7 +554,8 @@ export default {
 
 /* Animations */
 @keyframes bounce {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0);
   }
   50% {
@@ -545,7 +564,8 @@ export default {
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0) rotate(0deg);
   }
   50% {
@@ -557,11 +577,11 @@ export default {
   .hero-title {
     font-size: 2rem;
   }
-  
+
   .hero-subtitle {
     font-size: 1rem;
   }
-  
+
   .section-title {
     font-size: 1.8rem;
   }

@@ -3,6 +3,8 @@ const books = require("@/controllers/book.controller");
 
 const router = express.Router();
 
+router.route("/genres").get(books.getGenres);
+router.route("/newest").get(books.getNewestBooks);
 router.route("/").get(books.findAll);
 router.route("/:id").get(books.findOne);
 

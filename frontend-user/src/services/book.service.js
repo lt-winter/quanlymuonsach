@@ -7,6 +7,12 @@ class BookService {
   async getAll(params = {}) {
     return (await this.api.get("/", { params })).data;
   }
+  async getNewestBooks(params = {}) {
+    return (await this.api.get("/newest", { params })).data;
+  }
+  async getGenres() {
+    return (await this.api.get("/genres")).data;
+  }
   async get(id) {
     return (await this.api.get(`/${id}`)).data;
   }

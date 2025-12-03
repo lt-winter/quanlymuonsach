@@ -55,10 +55,7 @@
     </div>
 
     <!-- Nhà xuất bản -->
-    <div
-      class="form-group position-relative"
-      ref="publisherDropdown"
-    >
+    <div class="form-group position-relative" ref="publisherDropdown">
       <label for="maNXB">Nhà xuất bản</label>
 
       <Field name="maNXB" v-slot="{ field }">
@@ -111,15 +108,92 @@
       <ErrorMessage name="maNXB" class="error-feedback" />
     </div>
 
-    <div class="form-group">
+    <div class="form-group position-relative" ref="authorDropdown">
       <label for="tacGia">Tác giả</label>
-      <Field
-        name="tacGia"
-        type="text"
-        class="form-control"
-        v-model="bookLocal.tacGia"
-      />
+      <Field name="tacGia" v-slot="{ field }">
+        <input
+          type="text"
+          class="form-control"
+          v-model="bookLocal.tacGia"
+          @input="(e) => { field.onChange(e); onAuthorInput(); }"
+          @focus="showAuthorDropdown = true"
+          @keydown.arrow-down.prevent="navigateAuthorSuggestions(1)"
+          @keydown.arrow-up.prevent="navigateAuthorSuggestions(-1)"
+          @keydown.enter.prevent="selectFirstAuthorSuggestion(field)"
+          placeholder="Nhập tên tác giả..."
+        />
+      </Field>
+      
+      <!-- Author Suggestions Dropdown -->
+      <div
+        v-if="showAuthorDropdown && filteredAuthorSuggestions.length > 0"
+        class="list-group position-absolute w-100 mt-1 shadow-sm genre-dropdown"
+      >
+        <button
+          v-for="(author, index) in filteredAuthorSuggestions"
+          :key="author"
+          type="button"
+          class="list-group-item list-group-item-action"
+          :class="{ active: index === selectedAuthorIndex }"
+          @mousedown.prevent="selectAuthor(author)"
+        >
+          <i class="fas fa-user-edit"></i> {{ author }}
+        </button>
+      </div>
+      
       <ErrorMessage name="tacGia" class="error-feedback" />
+    </div>
+
+    <!-- Thể loại -->
+    <div class="form-group position-relative" ref="genreDropdown">
+      <label for="theLoai"
+        >Thể loại <span class="text-muted">(có thể bỏ trống)</span></label
+      >
+      <div class="tags-input-wrapper">
+        <div class="tags-container">
+          <span
+            v-for="(tag, index) in bookLocal.theLoai"
+            :key="index"
+            class="tag"
+          >
+            {{ tag }}
+            <i class="fas fa-times" @click="removeTag(index)"></i>
+          </span>
+          <input
+            type="text"
+            class="tag-input"
+            placeholder="Nhập thể loại và nhấn Enter..."
+            v-model="newTag"
+            @input="onGenreInput"
+            @focus="showGenreDropdown = true"
+            @keydown.enter.prevent="selectFirstSuggestion"
+            @keydown.tab.prevent="selectFirstSuggestion"
+            @keydown.arrow-down.prevent="navigateSuggestions(1)"
+            @keydown.arrow-up.prevent="navigateSuggestions(-1)"
+          />
+        </div>
+      </div>
+      
+      <!-- Genre Suggestions Dropdown -->
+      <div
+        v-if="showGenreDropdown && filteredGenreSuggestions.length > 0"
+        class="list-group position-absolute w-100 mt-1 shadow-sm genre-dropdown"
+      >
+        <button
+          v-for="(genre, index) in filteredGenreSuggestions"
+          :key="genre"
+          type="button"
+          class="list-group-item list-group-item-action"
+          :class="{ active: index === selectedSuggestionIndex }"
+          @mousedown.prevent="selectGenre(genre)"
+        >
+          <i class="fas fa-tag"></i> {{ genre }}
+        </button>
+      </div>
+      
+      <small class="form-text text-muted">
+        Chọn từ gợi ý hoặc nhập mới. Ví dụ: Văn học, Khoa học, Trinh thám...
+      </small>
     </div>
 
     <!-- Mô tả -->
@@ -147,12 +221,12 @@
         v-model="bookLocal.anhSach"
       />
       <ErrorMessage name="anhSach" class="error-feedback" />
-      
+
       <!-- Preview ảnh -->
       <div class="image-preview mt-2">
-        <img 
+        <img
           v-if="bookLocal.anhSach && isValidImageUrl"
-          :src="bookLocal.anhSach" 
+          :src="bookLocal.anhSach"
           alt="Preview ảnh sách"
           @error="handleImageError"
         />
@@ -161,7 +235,10 @@
           <span>Chưa có ảnh</span>
         </div>
       </div>
-      <div v-if="bookLocal.anhSach && !isValidImageUrl" class="image-error mt-2">
+      <div
+        v-if="bookLocal.anhSach && !isValidImageUrl"
+        class="image-error mt-2"
+      >
         <i class="fas fa-exclamation-triangle"></i> URL ảnh không hợp lệ
       </div>
     </div>
@@ -187,6 +264,7 @@
 import * as yup from "yup";
 import { Form, Field, ErrorMessage } from "vee-validate";
 import PublisherService from "@/services/publisher.service";
+import BookService from "@/services/book.service";
 
 export default {
   components: { Form, Field, ErrorMessage },
@@ -204,7 +282,7 @@ export default {
         .number()
         .typeError("Đơn giá phải là số.")
         .required("Đơn giá là bắt buộc."),
-      soQuyen: yup.number().typeError("Số quyển phải là số.").min(1).required(),
+      soQuyen: yup.number().typeError("Số quyển phải là số.").min(0).required(),
       namXuatBan: yup
         .number()
         .typeError("Năm xuất bản không hợp lệ.")
@@ -220,27 +298,39 @@ export default {
         .string()
         .nullable()
         .notRequired()
-        .test("is-valid-image-url", "URL phải là đường dẫn đến file ảnh (jpg, png, gif, webp, svg)", (value) => {
-          if (!value || value === "") return true;
-          const urlPattern = /^https?:\/\/.+\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i;
-          return urlPattern.test(value);
-        }),
+        .test(
+          "is-valid-image-url",
+          "URL phải là đường dẫn đến file ảnh (jpg, png, gif, webp, svg)",
+          (value) => {
+            if (!value || value === "") return true;
+            const urlPattern =
+              /^https?:\/\/.+\.(jpg|jpeg|png|gif|webp|svg)(\?.*)?$/i;
+            return urlPattern.test(value);
+          }
+        ),
     });
 
     return {
-      bookLocal: { ...this.book },
+      bookLocal: { ...this.book, theLoai: this.book.theLoai || [] },
       bookFormSchema,
       showDropdown: false,
       publishers: [],
       publisherSearch: "",
       imageLoadError: false,
+      newTag: "",
+      showGenreDropdown: false,
+      availableGenres: [],
+      selectedSuggestionIndex: -1,
+      showAuthorDropdown: false,
+      availableAuthors: [],
+      selectedAuthorIndex: -1,
     };
   },
 
   watch: {
     book: {
       handler(newBook) {
-        this.bookLocal = { ...newBook };
+        this.bookLocal = { ...newBook, theLoai: newBook.theLoai || [] };
         if (this.bookLocal.donGia) {
           this.bookLocal.donGia = String(this.bookLocal.donGia);
         }
@@ -261,7 +351,7 @@ export default {
     publishers() {
       this.syncPublisherSearch();
     },
-    
+
     "bookLocal.anhSach"() {
       this.imageLoadError = false;
     },
@@ -273,6 +363,26 @@ export default {
       return this.publishers.filter((p) =>
         p.tenNXB.toLowerCase().includes(this.publisherSearch.toLowerCase())
       );
+    },
+    filteredGenreSuggestions() {
+      if (!this.newTag.trim()) return this.availableGenres;
+      const search = this.newTag.trim().toLowerCase();
+      return this.availableGenres
+        .filter(
+          (genre) =>
+            genre.toLowerCase().includes(search) &&
+            !this.bookLocal.theLoai.includes(genre)
+        )
+        .slice(0, 5);
+    },
+    filteredAuthorSuggestions() {
+      if (!this.bookLocal.tacGia || !this.bookLocal.tacGia.trim()) {
+        return this.availableAuthors.slice(0, 5);
+      }
+      const search = this.bookLocal.tacGia.trim().toLowerCase();
+      return this.availableAuthors
+        .filter((author) => author.toLowerCase().includes(search))
+        .slice(0, 5);
     },
     isValidImageUrl() {
       if (!this.bookLocal.anhSach) return false;
@@ -326,18 +436,150 @@ export default {
     deleteBook() {
       this.$emit("delete:book", this.bookLocal._id);
     },
-    
+
     handleClickOutside(event) {
-      const dropdown = this.$refs.publisherDropdown;
-      if (dropdown && !dropdown.contains(event.target)) {
+      const publisherDropdown = this.$refs.publisherDropdown;
+      if (publisherDropdown && !publisherDropdown.contains(event.target)) {
         this.showDropdown = false;
       }
+      
+      const genreDropdown = this.$refs.genreDropdown;
+      if (genreDropdown && !genreDropdown.contains(event.target)) {
+        this.showGenreDropdown = false;
+        this.selectedSuggestionIndex = -1;
+      }
+      
+      const authorDropdown = this.$refs.authorDropdown;
+      if (authorDropdown && !authorDropdown.contains(event.target)) {
+        this.showAuthorDropdown = false;
+        this.selectedAuthorIndex = -1;
+      }
     },
-    
+
     handleImageError() {
       this.imageLoadError = true;
     },
-    
+
+    async fetchAvailableGenres() {
+      try {
+        const books = await BookService.getAll();
+        const genresSet = new Set();
+        books.forEach((book) => {
+          if (book.theLoai && Array.isArray(book.theLoai)) {
+            book.theLoai.forEach((genre) => genresSet.add(genre));
+          }
+        });
+        this.availableGenres = Array.from(genresSet).sort();
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    async fetchAvailableAuthors() {
+      try {
+        const books = await BookService.getAll();
+        const authorsSet = new Set();
+        books.forEach((book) => {
+          if (book.tacGia && book.tacGia.trim()) {
+            authorsSet.add(book.tacGia.trim());
+          }
+        });
+        this.availableAuthors = Array.from(authorsSet).sort();
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    onGenreInput() {
+      this.showGenreDropdown = true;
+      this.selectedSuggestionIndex = -1;
+    },
+
+    selectGenre(genre) {
+      if (!this.bookLocal.theLoai.includes(genre)) {
+        this.bookLocal.theLoai = [...this.bookLocal.theLoai, genre];
+      }
+      this.newTag = "";
+      this.showGenreDropdown = false;
+      this.selectedSuggestionIndex = -1;
+    },
+
+    selectFirstSuggestion() {
+      if (this.filteredGenreSuggestions.length > 0 && this.selectedSuggestionIndex >= 0) {
+        this.selectGenre(this.filteredGenreSuggestions[this.selectedSuggestionIndex]);
+      } else {
+        this.addTag();
+      }
+    },
+
+    navigateSuggestions(direction) {
+      const maxIndex = this.filteredGenreSuggestions.length - 1;
+      if (maxIndex < 0) return;
+      
+      this.selectedSuggestionIndex += direction;
+      if (this.selectedSuggestionIndex > maxIndex) {
+        this.selectedSuggestionIndex = 0;
+      } else if (this.selectedSuggestionIndex < 0) {
+        this.selectedSuggestionIndex = maxIndex;
+      }
+    },
+
+    addTag() {
+      const tag = this.newTag.trim();
+      if (tag && !this.bookLocal.theLoai.includes(tag)) {
+        this.bookLocal.theLoai = [...this.bookLocal.theLoai, tag];
+        this.newTag = "";
+        this.showGenreDropdown = false;
+        this.selectedSuggestionIndex = -1;
+      }
+    },
+
+    removeTag(index) {
+      this.bookLocal.theLoai.splice(index, 1);
+    },
+
+    handleGenreClickOutside(event) {
+      const dropdown = this.$refs.genreDropdown;
+      if (dropdown && !dropdown.contains(event.target)) {
+        this.showGenreDropdown = false;
+        this.selectedSuggestionIndex = -1;
+      }
+    },
+
+    onAuthorInput() {
+      this.showAuthorDropdown = true;
+      this.selectedAuthorIndex = -1;
+    },
+
+    selectAuthor(author) {
+      this.bookLocal.tacGia = author;
+      if (this.$refs.form?.setFieldValue) {
+        this.$refs.form.setFieldValue('tacGia', author);
+      }
+      this.showAuthorDropdown = false;
+      this.selectedAuthorIndex = -1;
+    },
+
+    selectFirstAuthorSuggestion(field) {
+      if (this.filteredAuthorSuggestions.length > 0 && this.selectedAuthorIndex >= 0) {
+        this.selectAuthor(this.filteredAuthorSuggestions[this.selectedAuthorIndex]);
+      } else {
+        this.showAuthorDropdown = false;
+      }
+    },
+
+    navigateAuthorSuggestions(direction) {
+      const maxIndex = this.filteredAuthorSuggestions.length - 1;
+      if (maxIndex < 0) return;
+      
+      this.selectedAuthorIndex += direction;
+      if (this.selectedAuthorIndex > maxIndex) {
+        this.selectedAuthorIndex = 0;
+      } else if (this.selectedAuthorIndex < 0) {
+        this.selectedAuthorIndex = maxIndex;
+      }
+    },
+
     Cancel() {
       const reply = window.confirm(
         "Bạn có chắc muốn hủy không? Mọi thay đổi sẽ không được lưu."
@@ -350,9 +592,11 @@ export default {
 
   async mounted() {
     await this.fetchPublishers();
+    await this.fetchAvailableGenres();
+    await this.fetchAvailableAuthors();
     document.addEventListener("click", this.handleClickOutside);
   },
-  
+
   beforeUnmount() {
     document.removeEventListener("click", this.handleClickOutside);
   },
@@ -364,6 +608,89 @@ export default {
 .page {
   max-width: 576px;
   margin: auto;
+}
+
+.tags-input-wrapper {
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  min-height: 42px;
+  background: white;
+}
+
+.tags-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 6px;
+  align-items: center;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: #007bff;
+  color: white;
+  border-radius: 16px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.tag i {
+  cursor: pointer;
+  font-size: 0.75rem;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.tag i:hover {
+  opacity: 1;
+}
+
+.tag-input {
+  flex: 1;
+  min-width: 150px;
+  border: none;
+  outline: none;
+  padding: 4px;
+  font-size: 0.875rem;
+}
+
+.tag-input::placeholder {
+  color: #999;
+}
+
+.genre-dropdown {
+  max-height: 200px;
+  overflow-y: auto;
+  z-index: 1000;
+  background: white;
+}
+
+.genre-dropdown .list-group-item {
+  cursor: pointer;
+  padding: 10px 15px;
+  transition: all 0.2s;
+}
+
+.genre-dropdown .list-group-item i {
+  color: #6c757d;
+  margin-right: 8px;
+}
+
+.genre-dropdown .list-group-item:hover {
+  background-color: #f8f9fa;
+}
+
+.genre-dropdown .list-group-item.active {
+  background-color: #007bff;
+  border-color: #007bff;
+  color: white;
+}
+
+.genre-dropdown .list-group-item.active i {
+  color: white;
 }
 
 .image-preview {

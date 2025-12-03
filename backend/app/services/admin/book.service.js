@@ -16,6 +16,7 @@ class BookService {
       tacGia: payload.tacGia,
       anhSach: payload.anhSach,
       moTa: payload.moTa,
+      theLoai: payload.theLoai || [], // Array thể loại
     };
     Object.keys(sach).forEach(
       (key) => sach[key] === undefined && delete sach[key],

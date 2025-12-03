@@ -13,38 +13,8 @@
           class="img-fluid rounded shadow"
           :alt="book.tenSach"
         />
-      </div>
-      <div class="col-md-8">
-        <h2>{{ book.tenSach }}</h2>
-        <hr />
-        <table class="table table-borderless">
-          <tr>
-            <th style="width: 200px"><i class="fas fa-user"></i> Tác giả:</th>
-            <td>{{ book.tacGia }}</td>
-          </tr>
-          <tr>
-            <th><i class="fas fa-building"></i> Nhà xuất bản:</th>
-            <td>{{ book.publisher?.tenNXB || "Chưa cập nhật" }}</td>
-          </tr>
-          <tr>
-            <th><i class="fas fa-calendar"></i> Năm xuất bản:</th>
-            <td>{{ book.namXuatBan }}</td>
-          </tr>
-          <tr>
-            <th><i class="fas fa-money-bill"></i> Đơn giá:</th>
-            <td>{{ formatCurrency(book.donGia) }} VNĐ</td>
-          </tr>
-          <tr>
-            <th><i class="fas fa-layer-group"></i> Số quyển:</th>
-            <td>
-              <span :class="book.soQuyen > 0 ? 'text-success' : 'text-danger'">
-                {{ book.soQuyen }} quyển
-              </span>
-            </td>
-          </tr>
-        </table>
 
-        <div class="mt-4">
+        <div class="mt-4 d-flex justify-content-center">
           <button
             v-if="user && book.soQuyen > 0"
             class="btn btn-success btn-lg"
@@ -76,6 +46,54 @@
         <router-link to="/books" class="btn btn-outline-secondary mt-3">
           <i class="fas fa-arrow-left"></i> Quay lại danh sách
         </router-link>
+      </div>
+      <div class="col-md-8">
+        <h2>{{ book.tenSach }}</h2>
+        <hr />
+        <table class="table table-borderless">
+          <tr>
+            <th style="width: 200px"><i class="fas fa-user"></i> Tác giả:</th>
+            <td>{{ book.tacGia }}</td>
+          </tr>
+          <tr>
+            <th><i class="fas fa-building"></i> Nhà xuất bản:</th>
+            <td>{{ book.publisher?.tenNXB || "Chưa cập nhật" }}</td>
+          </tr>
+          <tr>
+            <th><i class="fas fa-calendar"></i> Năm xuất bản:</th>
+            <td>{{ book.namXuatBan }}</td>
+          </tr>
+          <tr v-if="book.theLoai && book.theLoai.length > 0">
+            <th><i class="fas fa-tags"></i> Thể loại:</th>
+            <td>
+              <span
+                v-for="genre in book.theLoai"
+                :key="genre"
+                class="badge badge-primary mr-2 mb-1"
+                style="font-size: 0.875rem; padding: 6px 12px"
+              >
+                {{ genre }}
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <th><i class="fas fa-money-bill"></i> Đơn giá:</th>
+            <td>{{ formatCurrency(book.donGia) }} VNĐ</td>
+          </tr>
+          <tr>
+            <th><i class="fas fa-layer-group"></i> Số quyển:</th>
+            <td>
+              <span :class="book.soQuyen > 0 ? 'text-success' : 'text-danger'">
+                {{ book.soQuyen }} quyển
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <th><i class="fas fa-info-circle"></i> Mô tả:</th>
+            <td v-if="book.moTa">{{ book.moTa }}</td>
+            <td v-else>Đang cập nhật...</td>
+          </tr>
+        </table>
       </div>
     </div>
 
