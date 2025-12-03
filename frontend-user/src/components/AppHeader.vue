@@ -1,17 +1,13 @@
 <template>
   <nav class="navbar navbar-expand navbar-dark sticky-top px-4 custom-navbar">
     <router-link to="/" class="navbar-brand d-flex align-items-center">
-      <i class="fas fa-book-reader brand-icon mr-2"></i>
-      <span class="brand-text">Thư viện</span>
+      <i class="fa-solid fa-snowflake brand-icon mr-2"></i>
+      <span class="brand-text">WinterLibrary</span>
     </router-link>
 
     <ul class="navbar-nav mx-auto nav-menu">
       <li class="nav-item">
-        <router-link 
-          :to="{ name: 'home' }" 
-          custom
-          v-slot="{ navigate }"
-        >
+        <router-link :to="{ name: 'home' }" custom v-slot="{ navigate }">
           <a
             @click="navigate"
             class="nav-link nav-link-custom"
@@ -23,15 +19,14 @@
         </router-link>
       </li>
       <li class="nav-item">
-        <router-link 
-          :to="{ name: 'books' }" 
-          custom
-          v-slot="{ navigate }"
-        >
+        <router-link :to="{ name: 'books' }" custom v-slot="{ navigate }">
           <a
             @click="navigate"
             class="nav-link nav-link-custom"
-            :class="{ 'active-link': $route.name === 'books' || $route.name === 'book.detail' }"
+            :class="{
+              'active-link':
+                $route.name === 'books' || $route.name === 'book.detail',
+            }"
           >
             <i class="fas fa-book"></i>
             <span>Sách</span>
@@ -39,11 +34,7 @@
         </router-link>
       </li>
       <li class="nav-item" v-if="user">
-        <router-link 
-          :to="{ name: 'my-borrows' }" 
-          custom
-          v-slot="{ navigate }"
-        >
+        <router-link :to="{ name: 'my-borrows' }" custom v-slot="{ navigate }">
           <a
             @click="navigate"
             class="nav-link nav-link-custom"
@@ -66,7 +57,10 @@
           </router-link>
         </li>
         <li class="nav-item">
-          <router-link :to="{ name: 'register' }" class="nav-link nav-link-custom">
+          <router-link
+            :to="{ name: 'register' }"
+            class="nav-link nav-link-custom"
+          >
             <i class="fas fa-user-plus"></i>
             <span>Đăng ký</span>
           </router-link>
@@ -107,7 +101,10 @@
           <li><hr class="dropdown-divider" /></li>
 
           <li>
-            <router-link :to="{ name: 'profile' }" class="dropdown-item profile-btn">
+            <router-link
+              :to="{ name: 'profile' }"
+              class="dropdown-item profile-btn"
+            >
               <i class="fas fa-user"></i>
               <span>Thông tin cá nhân</span>
             </router-link>
