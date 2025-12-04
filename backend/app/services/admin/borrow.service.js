@@ -227,6 +227,15 @@ class BorrowService {
       },
       { $unwind: { path: "$nhanVienDuyet", preserveNullAndEmptyArrays: true } },
       {
+        $lookup: {
+          from: "nhanvien",
+          localField: "maNhanVien",
+          foreignField: "maNhanVien",
+          as: "nhanVienLegacy",
+        },
+      },
+      { $unwind: { path: "$nhanVienLegacy", preserveNullAndEmptyArrays: true } },
+      {
         $addFields: {
           hanTra: {
             $dateAdd: {
@@ -235,6 +244,7 @@ class BorrowService {
               amount: BorrowService.LOAN_PERIOD_DAYS,
             },
           },
+          nhanVienTao: { $ifNull: ["$nhanVienTao", "$nhanVienLegacy"] },
         },
       },
       { $sort: sort._id ? sort : { ngayMuon: -1 } },
@@ -295,6 +305,15 @@ class BorrowService {
       },
       { $unwind: { path: "$nhanVienDuyet", preserveNullAndEmptyArrays: true } },
       {
+        $lookup: {
+          from: "nhanvien",
+          localField: "maNhanVien",
+          foreignField: "maNhanVien",
+          as: "nhanVienLegacy",
+        },
+      },
+      { $unwind: { path: "$nhanVienLegacy", preserveNullAndEmptyArrays: true } },
+      {
         $addFields: {
           hanTra: {
             $dateAdd: {
@@ -303,6 +322,7 @@ class BorrowService {
               amount: BorrowService.LOAN_PERIOD_DAYS,
             },
           },
+          nhanVienTao: { $ifNull: ["$nhanVienTao", "$nhanVienLegacy"] },
         },
       },
     ];

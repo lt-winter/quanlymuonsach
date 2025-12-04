@@ -75,8 +75,10 @@
             :class="{ active: book.maSach === borrowLocal.maSach }"
             @click="() => selectBook(book, field)"
           >
-            {{ book.tenSach }} - {{ book.tacGia }} 
-            <span class="badge badge-info ml-2">Còn {{ book.soQuyen }} quyển</span>
+            {{ book.tenSach }} - {{ book.tacGia }}
+            <span class="badge badge-info ml-2"
+              >Còn {{ book.soQuyen }} quyển</span
+            >
           </button>
           <div
             v-if="filteredBooks.length === 0"
@@ -118,6 +120,39 @@
         <div class="status-display" :class="statusClass">
           {{ statusText }}
         </div>
+      </div>
+
+      <!-- Người tạo phiếu -->
+      <div class="form-group" v-if="borrowLocal.nhanVienTao">
+        <label>Người tạo phiếu</label>
+        <input
+          type="text"
+          class="form-control"
+          :value="borrowLocal.nhanVienTao.hoTenNv || 'N/A'"
+          disabled
+        />
+      </div>
+
+      <!-- Người duyệt phiếu -->
+      <div class="form-group" v-if="borrowLocal.nhanVienDuyet">
+        <label>Người duyệt phiếu</label>
+        <input
+          type="text"
+          class="form-control"
+          :value="borrowLocal.nhanVienDuyet.hoTenNv || 'N/A'"
+          disabled
+        />
+      </div>
+
+      <!-- Ngày duyệt -->
+      <div class="form-group" v-if="borrowLocal.ngayDuyet">
+        <label>Ngày duyệt</label>
+        <input
+          type="text"
+          class="form-control"
+          :value="formatDate(borrowLocal.ngayDuyet)"
+          disabled
+        />
       </div>
 
       <div class="form-group" v-if="borrowLocal.ngayTra">

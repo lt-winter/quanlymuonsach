@@ -12,8 +12,8 @@ exports.create = async (req, res, next) => {
   }
   try {
     const borrowService = new BorrowService(MongoDB.client);
-    // Lấy ID người tạo từ token (đã được xác thực qua middleware)
-    const nguoiTaoId = req.user?._id || null;
+    // Lấy mã nhân viên từ token (đã được xác thực qua middleware)
+    const nguoiTaoId = req.user?.maNhanVien || null;
     const document = await borrowService.create(req.body, nguoiTaoId);
     return res.send(document);
   } catch (error) {
@@ -177,8 +177,8 @@ exports.getStats = async (req, res, next) => {
 exports.approve = async (req, res, next) => {
   try {
     const borrowService = new BorrowService(MongoDB.client);
-    // Lấy ID người duyệt từ token (đã được xác thực qua middleware)
-    const nguoiDuyetId = req.user?._id || null;
+    // Lấy mã nhân viên từ token (đã được xác thực qua middleware)
+    const nguoiDuyetId = req.user?.maNhanVien || null;
     const document = await borrowService.approve(req.params.id, nguoiDuyetId);
     if (!document) {
       return next(new ApiError(404, "Không tìm thấy phiếu mượn"));
@@ -209,8 +209,8 @@ exports.approve = async (req, res, next) => {
 exports.reject = async (req, res, next) => {
   try {
     const borrowService = new BorrowService(MongoDB.client);
-    // Lấy ID người duyệt từ token (đã được xác thực qua middleware)
-    const nguoiDuyetId = req.user?._id || null;
+    // Lấy mã nhân viên từ token (đã được xác thực qua middleware)
+    const nguoiDuyetId = req.user?.maNhanVien || null;
     const lyDo = req.body?.lyDo || "";
     const document = await borrowService.reject(req.params.id, nguoiDuyetId, lyDo);
     if (!document) {
