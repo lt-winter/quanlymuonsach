@@ -137,6 +137,9 @@
                 <span v-if="book.soQuyen <= 0" class="out-of-stock-badge">
                   Hết sách
                 </span>
+                <span v-else class="quantity-badge">
+                  SL: {{ book.soQuyen }}
+                </span>
               </div>
 
               <div class="book-info">
@@ -145,15 +148,6 @@
                   <i class="fas fa-pen-fancy"></i>
                   {{ book.tacGia || "Đang cập nhật" }}
                 </p>
-                <div class="book-meta">
-                  <span class="book-price" v-if="book.donGia">
-                    {{ new Intl.NumberFormat("vi-VN").format(book.donGia) }}đ
-                  </span>
-                  <span class="book-quantity">
-                    <i class="fas fa-layer-group"></i>
-                    {{ book.soQuyen > 0 ? book.soQuyen : 0 }}
-                  </span>
-                </div>
               </div>
             </div>
           </router-link>
@@ -544,6 +538,19 @@ export default {
   top: 10px;
   right: 10px;
   background: #ef476f;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 1;
+}
+
+.quantity-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #4361ee;
   color: white;
   padding: 6px 12px;
   border-radius: 20px;

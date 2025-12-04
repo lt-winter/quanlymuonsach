@@ -57,6 +57,37 @@
       </div>
     </div>
 
+    <!-- Genre Filter -->
+    <div class="genre-filter-section" v-if="availableGenres.length > 0">
+      <label class="filter-label">
+        <i class="fas fa-filter"></i> Lọc theo thể loại:
+      </label>
+
+      <div class="genre-tags">
+        <button
+          class="genre-tag"
+          :class="{ active: selectedGenres.length === 0 }"
+          @click="selectGenre(null)"
+        >
+          <i class="fas fa-th"></i> Tất cả
+        </button>
+        <button
+          v-for="genre in availableGenres"
+          :key="genre"
+          class="genre-tag"
+          :class="{ active: selectedGenres.includes(genre) }"
+          @click="selectGenre(genre)"
+        >
+          {{ genre }}
+          <i 
+            v-if="selectedGenres.includes(genre)"
+            class="fas fa-times"
+            @click.stop="removeGenre(genre)"
+          ></i>
+        </button>
+      </div>
+    </div>
+
     <div class="content-area">
       <BookList
         v-if="filteredBooksCount > 0"
@@ -94,6 +125,8 @@ export default {
         { value: "", label: "Mặc định" },
         { value: "tenSach", label: "Tên sách" },
       ],
+      allGenres: [],
+      selectedGenres: [],
     };
   },
   watch: {
@@ -106,6 +139,12 @@ export default {
     order() {
       this.retrieveBooks();
     },
+    selectedGenres: {
+      handler() {
+        this.activeIndex = -1;
+      },
+      deep: true,
+    },
   },
   computed: {
     bookString() {
@@ -115,10 +154,23 @@ export default {
       });
     },
     filteredBooks() {
-      if (!this.searchText) return this.books;
-      return this.books.filter((_book, index) =>
-        this.bookString[index].includes(this.searchText.toLowerCase())
-      );
+      let result = this.books;
+
+      // Filter by genre
+      if (this.selectedGenres.length > 0) {
+        result = result.filter((book) =>
+          this.selectedGenres.every((genre) =>
+            book.theLoai && book.theLoai.includes(genre)
+          )
+        );
+      }
+
+      // Filter by search text
+      if (!this.searchText) return result;
+      return result.filter((_book, index) => {
+        const bookIdx = this.books.indexOf(_book);
+        return this.bookString[bookIdx].includes(this.searchText.toLowerCase());
+      });
     },
     activeBook() {
       if (this.activeIndex < 0) return null;
@@ -126,6 +178,15 @@ export default {
     },
     filteredBooksCount() {
       return this.filteredBooks.length;
+    },
+    availableGenres() {
+      const genres = new Set();
+      this.books.forEach((book) => {
+        if (book.theLoai && Array.isArray(book.theLoai)) {
+          book.theLoai.forEach((genre) => genres.add(genre));
+        }
+      });
+      return Array.from(genres).sort();
     },
   },
   methods: {
@@ -142,6 +203,21 @@ export default {
       } catch (error) {
         console.log(error);
       }
+    },
+    selectGenre(genre) {
+      if (genre === null) {
+        // "Tất cả" button clicked
+        this.selectedGenres = [];
+      } else if (this.selectedGenres.includes(genre)) {
+        // Deselect if already selected
+        this.selectedGenres = this.selectedGenres.filter((g) => g !== genre);
+      } else {
+        // Select genre
+        this.selectedGenres.push(genre);
+      }
+    },
+    removeGenre(genre) {
+      this.selectedGenres = this.selectedGenres.filter((g) => g !== genre);
     },
     refreshList() {
       this.retrieveBooks();
@@ -314,6 +390,99 @@ export default {
   background: #e5e7eb;
 }
 
+.action-btn.add {
+  background: linear-gradient(135deg, #4361ee, #3f51b5);
+  color: white;
+}
+
+.action-btn.add:hover {
+  background: linear-gradient(135deg, #3f4fd9, #3845a3);
+  box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+}
+
+.action-btn.delete {
+  background: #fee2e2;
+  color: #dc2626;
+}
+
+.action-btn.delete:hover {
+  background: #fecaca;
+}
+
+/* Genre Filter Styles */
+.genre-filter-section {
+  margin: 0 0 20px 0;
+  background: white;
+  border-radius: 12px;
+  padding: 15px 20px;
+  border: 1px solid #e5e7eb;
+}
+
+.filter-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 12px;
+  font-size: 0.9rem;
+}
+
+.filter-label i {
+  color: #4361ee;
+}
+
+.genre-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.genre-tag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 2px solid #d1d5db;
+  border-radius: 20px;
+  background: white;
+  color: #4b5563;
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.genre-tag:hover {
+  border-color: #4361ee;
+  color: #4361ee;
+  background: #f0f4ff;
+}
+
+.genre-tag.active {
+  background: linear-gradient(135deg, #4361ee, #3f51b5);
+  color: white;
+  border-color: #4361ee;
+}
+
+.genre-tag.active:hover {
+  background: linear-gradient(135deg, #3f4fd9, #3845a3);
+  box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+}
+
+.genre-tag i {
+  font-size: 0.7rem;
+  opacity: 0.8;
+}
+
+.genre-tag.active i {
+  cursor: pointer;
+}
+
+.genre-tag.active i:hover {
+  opacity: 1;
+}
 .action-btn.add {
   background: linear-gradient(135deg, #06d6a0, #05b384);
   color: white;

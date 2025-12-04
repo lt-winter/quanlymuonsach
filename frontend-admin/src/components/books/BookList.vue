@@ -33,6 +33,12 @@ export default {
                 <i class="fas fa-eye"></i> Xem chi tiết
               </span>
             </div>
+            <span v-if="book.soQuyen <= 0" class="out-of-stock-badge">
+              Hết sách
+            </span>
+            <span v-else class="quantity-badge">
+              SL: {{ book.soQuyen }}
+            </span>
           </div>
 
           <div class="book-info">
@@ -53,15 +59,6 @@ export default {
               </span>
               <span v-if="book.theLoai.length > 2" class="genre-more">
                 +{{ book.theLoai.length - 2 }}
-              </span>
-            </div>
-            
-            <div class="book-meta">
-              <span class="book-price" v-if="book.donGia">
-                {{ new Intl.NumberFormat("vi-VN").format(book.donGia) }}đ
-              </span>
-              <span class="book-quantity" v-if="book.soQuyen">
-                <i class="fas fa-layer-group"></i> {{ book.soQuyen }}
               </span>
             </div>
           </div>
@@ -221,5 +218,31 @@ export default {
 
 .book-quantity i {
   font-size: 0.7rem;
+}
+
+.out-of-stock-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #ef476f;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 1;
+}
+
+.quantity-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #4361ee;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 1;
 }
 </style>

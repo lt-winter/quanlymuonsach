@@ -40,22 +40,6 @@
             <i class="fas fa-filter"></i> Lọc theo thể loại:
           </label>
 
-          <!-- Hiển thị các thể loại đã chọn -->
-          <div v-if="selectedGenres.length > 0" class="selected-genres mb-3">
-            <span class="selected-label">Thể loại đã chọn:</span>
-            <span
-              v-for="genre in selectedGenres"
-              :key="'selected-' + genre"
-              class="selected-genre-badge"
-            >
-              {{ genre }}
-              <i class="fas fa-times" @click="removeGenre(genre)"></i>
-            </span>
-            <button class="btn-clear-all" @click="selectGenre(null)">
-              <i class="fas fa-times-circle"></i> Xóa tất cả
-            </button>
-          </div>
-
           <div class="genre-tags">
             <button
               class="genre-tag"
@@ -72,6 +56,11 @@
               @click="selectGenre(genre)"
             >
               {{ genre }}
+              <i
+                v-if="selectedGenres.includes(genre)"
+                class="fas fa-times"
+                @click.stop="removeGenre(genre)"
+              ></i>
             </button>
           </div>
         </div>
@@ -114,6 +103,9 @@
                 <span v-if="book.soQuyen <= 0" class="out-of-stock-badge">
                   Hết sách
                 </span>
+                <span v-else class="quantity-badge">
+                  {{ book.soQuyen }}
+                </span>
               </div>
 
               <div class="book-info p-3">
@@ -134,16 +126,6 @@
                     class="genre-badge"
                   >
                     {{ genre }}
-                  </span>
-                </div>
-
-                <div class="book-meta">
-                  <span class="book-price" v-if="book.donGia">
-                    {{ new Intl.NumberFormat("vi-VN").format(book.donGia) }}đ
-                  </span>
-                  <span class="book-quantity">
-                    <i class="fas fa-layer-group"></i>
-                    {{ book.soQuyen > 0 ? book.soQuyen : 0 }}
                   </span>
                 </div>
               </div>
@@ -276,9 +258,9 @@ export default {
           params.name = this.searchText;
         }
 
-        console.log('Fetching books with params:', params);
+        console.log("Fetching books with params:", params);
         const response = await BookService.getAll(params);
-        console.log('Response:', response);
+        console.log("Response:", response);
 
         // Xử lý response có pagination
         if (response.data && response.pagination) {
@@ -298,7 +280,7 @@ export default {
       }
     },
     selectGenre(genre) {
-      console.log('selectGenre called with:', genre);
+      console.log("selectGenre called with:", genre);
       if (genre === null) {
         // Click "Tất cả" - bỏ chọn tất cả
         this.selectedGenres = [];
@@ -311,7 +293,7 @@ export default {
           this.selectedGenres.push(genre);
         }
       }
-      console.log('selectedGenres after update:', this.selectedGenres);
+      console.log("selectedGenres after update:", this.selectedGenres);
     },
     removeGenre(genre) {
       const index = this.selectedGenres.indexOf(genre);
@@ -350,11 +332,11 @@ export default {
     },
     selectedGenres: {
       handler() {
-        console.log('watch selectedGenres triggered');
+        console.log("watch selectedGenres triggered");
         this.currentPage = 1;
         this.fetchBooks();
       },
-      deep: true
+      deep: true,
     },
   },
   mounted() {
@@ -385,70 +367,6 @@ export default {
   margin-right: 6px;
 }
 
-.selected-genres {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-  padding: 12px;
-  background: #f8f9fa;
-  border-radius: 8px;
-  border: 1px dashed #d1d5db;
-}
-
-.selected-label {
-  font-size: 0.875rem;
-  color: #6b7280;
-  font-weight: 500;
-}
-
-.selected-genre-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  background: linear-gradient(135deg, #4361ee, #7209b7);
-  color: white;
-  border-radius: 16px;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.selected-genre-badge i {
-  cursor: pointer;
-  font-size: 0.75rem;
-  opacity: 0.8;
-  transition: opacity 0.2s;
-}
-
-.selected-genre-badge i:hover {
-  opacity: 1;
-}
-
-.btn-clear-all {
-  padding: 6px 12px;
-  background: #ef476f;
-  color: white;
-  border: none;
-  border-radius: 16px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.btn-clear-all:hover {
-  background: #dc2f55;
-  transform: translateY(-1px);
-}
-
-.btn-clear-all i {
-  font-size: 0.875rem;
-}
-
 .genre-tags {
   display: flex;
   flex-wrap: wrap;
@@ -465,6 +383,9 @@ export default {
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .genre-tag:hover {
@@ -481,8 +402,14 @@ export default {
 }
 
 .genre-tag i {
-  margin-right: 4px;
+  margin-left: 4px;
   font-size: 0.75rem;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.genre-tag.active i {
+  opacity: 1;
 }
 
 .book-genres {
@@ -652,6 +579,19 @@ export default {
   top: 10px;
   right: 10px;
   background: #ef476f;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  z-index: 1;
+}
+
+.quantity-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #4361ee;
   color: white;
   padding: 6px 12px;
   border-radius: 20px;
