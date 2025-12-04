@@ -411,7 +411,7 @@ export default {
       try {
         this.publishers = await PublisherService.getAll();
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     },
 
@@ -471,7 +471,7 @@ export default {
         });
         this.availableGenres = Array.from(genresSet).sort();
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     },
 
@@ -486,7 +486,7 @@ export default {
         });
         this.availableAuthors = Array.from(authorsSet).sort();
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     },
 

@@ -105,6 +105,58 @@
       </div>
     </div>
 
+    <!-- Random Books Section -->
+    <div class="books-section random-books-section">
+      <h2 class="section-title text-center mb-5">
+        <i class="fas fa-dice"></i> Gợi ý cho bạn
+      </h2>
+      <div v-if="loadingRandom" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="sr-only">Đang tải...</span>
+        </div>
+      </div>
+      <div v-else class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+        <div v-for="book in randomBooks" :key="book.maSach" class="col mb-4">
+          <router-link
+            :to="{ name: 'book.detail', params: { id: book.maSach } }"
+            custom
+            v-slot="{ navigate }"
+          >
+            <div class="book-card" @click="navigate">
+              <div class="book-image-wrapper">
+                <img
+                  :src="book.anhSach || '/placeholder-book.svg'"
+                  class="book-image"
+                  :alt="book.tenSach"
+                />
+                <div class="book-overlay">
+                  <span class="view-btn">
+                    <i class="fas fa-eye"></i> Xem chi tiết
+                  </span>
+                </div>
+                <span class="quantity-badge">
+                  {{ book.soQuyen }}
+                </span>
+              </div>
+
+              <div class="book-info">
+                <h5 class="book-title">{{ book.tenSach }}</h5>
+                <p class="book-author">
+                  <i class="fas fa-pen-fancy"></i>
+                  {{ book.tacGia || "Đang cập nhật" }}
+                </p>
+              </div>
+            </div>
+          </router-link>
+        </div>
+      </div>
+      <div class="text-center mt-4">
+        <button @click="loadRandomBooks" class="btn btn-outline-primary">
+          <i class="fas fa-sync-alt"></i> Tải lại gợi ý
+        </button>
+      </div>
+    </div>
+
     <!-- Latest Books Section -->
     <div class="books-section">
       <h2 class="section-title text-center mb-5">
@@ -166,10 +218,27 @@ export default {
   data() {
     return {
       latestBooks: [],
+      randomBooks: [],
       loading: false,
+      loadingRandom: false,
     };
   },
   methods: {
+    async loadRandomBooks() {
+      this.loadingRandom = true;
+      try {
+        const response = await BookService.getRandomBooks({ limit: 8 });
+        if (response.data && Array.isArray(response.data)) {
+          this.randomBooks = response.data;
+        } else if (Array.isArray(response)) {
+          this.randomBooks = response;
+        }
+      } catch (error) {
+        console.error("Error fetching random books:", error);
+      } finally {
+        this.loadingRandom = false;
+      }
+    },
     animateNumbers() {
       const stats = document.querySelectorAll(".stat-number");
       stats.forEach((stat) => {
@@ -197,6 +266,10 @@ export default {
     },
   },
   async mounted() {
+    // Load random books
+    this.loadRandomBooks();
+
+    // Load newest books
     this.loading = true;
     try {
       const response = await BookService.getNewestBooks({ limit: 8 });
@@ -406,6 +479,13 @@ export default {
 /* Books Section */
 .books-section {
   margin: 80px 0;
+}
+
+.random-books-section {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  padding: 60px 20px;
+  margin: 80px -15px;
+  border-radius: 30px;
 }
 
 .book-card {

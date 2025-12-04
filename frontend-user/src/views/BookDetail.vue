@@ -8,6 +8,9 @@
 
     <div v-else-if="book" class="row">
       <div class="col-md-4">
+        <router-link to="/books" class="btn btn-outline-secondary mb-3">
+          <i class="fas fa-arrow-left"></i> Quay lại danh sách
+        </router-link>
         <img
           :src="book.anhSach || '/placeholder-book.svg'"
           class="img-fluid rounded shadow"
@@ -42,10 +45,6 @@
         <div v-if="message" class="alert alert-info mt-3">
           {{ message }}
         </div>
-
-        <router-link to="/books" class="btn btn-outline-secondary mt-3">
-          <i class="fas fa-arrow-left"></i> Quay lại danh sách
-        </router-link>
       </div>
       <div class="col-md-8">
         <h2>{{ book.tenSach }}</h2>

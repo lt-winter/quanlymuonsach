@@ -164,7 +164,7 @@ export default {
           order: this.order,
         });
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     },
     refreshList() {
@@ -177,7 +177,7 @@ export default {
           await PublisherService.deleteAll();
           this.refreshList();
         } catch (error) {
-          console.log(error);
+          console.error(error);
         }
       }
     },

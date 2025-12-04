@@ -10,6 +10,9 @@ class BookService {
   async getNewestBooks(params = {}) {
     return (await this.api.get("/newest", { params })).data;
   }
+  async getRandomBooks(params = {}) {
+    return (await this.api.get("/random", { params })).data;
+  }
   async getGenres() {
     return (await this.api.get("/genres")).data;
   }

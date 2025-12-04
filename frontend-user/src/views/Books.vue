@@ -80,7 +80,7 @@
               <CustomSelect
                 v-model="sortBy"
                 :options="sortOptions"
-                placeholder="Sắp xếp theo"
+                placeholder="Mã sách"
                 @update:modelValue="fetchBooks"
               />
             </div>
@@ -237,7 +237,7 @@ export default {
       totalBooks: 0,
       totalPages: 0,
       sortOptions: [
-        { value: "", label: "Sắp xếp theo" },
+        { value: "", label: "Mã sách" },
         { value: "tenSach", label: "Tên sách" },
         { value: "tacGia", label: "Tác giả" },
         { value: "namXuatBan", label: "Năm xuất bản" },
@@ -291,9 +291,7 @@ export default {
           params.name = this.searchText;
         }
 
-        console.log("Fetching books with params:", params);
         const response = await BookService.getAll(params);
-        console.log("Response:", response);
 
         // Xử lý response có pagination
         if (response.data && response.pagination) {
@@ -313,10 +311,8 @@ export default {
       }
     },
     selectGenre(genre) {
-      console.log("selectGenre called with:", genre);
       this.selectedGenre = genre;
       this.showMobileFilter = false;
-      console.log("selectedGenre after update:", this.selectedGenre);
     },
     changePage(page) {
       if (page >= 1 && page <= this.totalPages) {
@@ -348,7 +344,6 @@ export default {
       this.fetchBooks();
     },
     selectedGenre() {
-      console.log("watch selectedGenre triggered");
       this.currentPage = 1;
       this.fetchBooks();
     },

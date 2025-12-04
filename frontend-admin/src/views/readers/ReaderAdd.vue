@@ -42,7 +42,7 @@ export default {
         await ReaderService.create(data);
         this.$router.push({ name: "readers" });
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     },
   },

@@ -50,7 +50,7 @@ export default {
         await BookService.create(data);
         this.$router.push({ name: "books" });
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     },
   },

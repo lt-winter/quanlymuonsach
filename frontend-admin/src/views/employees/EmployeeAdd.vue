@@ -42,7 +42,7 @@ export default {
         await EmployeeService.create(data);
         this.$router.push({ name: "employees" });
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     },
   },

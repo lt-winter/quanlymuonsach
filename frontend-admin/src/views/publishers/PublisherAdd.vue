@@ -42,7 +42,7 @@ export default {
         await PublisherService.create(data);
         this.$router.push({ name: "publishers" });
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     },
   },

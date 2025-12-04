@@ -164,7 +164,6 @@ export default {
       this.loading = true;
       try {
         const data = await BorrowService.getMyBorrows();
-        // console.log("Borrows data:", data);
         this.borrows = data;
       } catch (error) {
         console.error("Error fetching borrows:", error);

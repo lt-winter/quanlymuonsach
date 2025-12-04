@@ -201,7 +201,7 @@ export default {
           order: this.order,
         });
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     },
     selectGenre(genre) {
@@ -229,7 +229,7 @@ export default {
           await BookService.deleteAll();
           this.refreshList();
         } catch (error) {
-          console.log(error);
+          console.error(error);
         }
       }
     },

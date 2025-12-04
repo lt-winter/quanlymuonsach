@@ -78,7 +78,7 @@ export default {
         await BookService.update(this.id, bookData);
         this.message = "Cập nhật sách thành công!";
       } catch (error) {
-        console.log(error);
+        console.error(error);
       }
     },
     async deleteBook() {
@@ -87,7 +87,7 @@ export default {
           await BookService.delete(this.book.maSach);
           this.$router.push({ name: "books" });
         } catch (error) {
-          console.log(error);
+          console.error(error);
         }
       }
     },

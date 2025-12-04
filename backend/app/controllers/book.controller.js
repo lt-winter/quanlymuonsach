@@ -5,7 +5,7 @@ const ApiError = require("@/api-error");
 exports.findAll = async (req, res, next) => {
   const { sortBy, order, theLoai, page, limit, name } = req.query;
   
-  console.log('findAll - Query params:', { sortBy, order, theLoai, page, limit, name });
+  // Debug logs removed
   
   try {
     const bookService = new BookService(MongoDB.client);
@@ -29,7 +29,7 @@ exports.findAll = async (req, res, next) => {
       ];
     }
     
-    console.log('Filter:', JSON.stringify(filter));
+    // Debug logs removed
     
     // Sắp xếp
     const sort = {};
@@ -90,6 +90,36 @@ exports.getNewestBooks = async (req, res, next) => {
   } catch (error) {
     return next(
       new ApiError(500, `Đã xảy ra lỗi khi truy xuất sách mới nhất: ${error.message}`),
+    );
+  }
+};
+
+exports.getRandomBooks = async (req, res, next) => {
+  const { limit } = req.query;
+  
+  try {
+    const bookService = new BookService(MongoDB.client);
+    
+    const limitNum = parseInt(limit) || 8;
+    
+    // Lấy sách ngẫu nhiên, chỉ lấy sách có số lượng > 1
+    const filter = { soQuyen: { $gt: 1 } };
+    const documents = await bookService.Sach.aggregate([
+      { $match: filter },
+      { $sample: { size: limitNum } }
+    ]).toArray();
+    
+    return res.send({
+      data: documents,
+      pagination: {
+        total: documents.length,
+        limit: limitNum,
+        count: documents.length
+      }
+    });
+  } catch (error) {
+    return next(
+      new ApiError(500, `Đã xảy ra lỗi khi truy xuất sách ngẫu nhiên: ${error.message}`),
     );
   }
 };
