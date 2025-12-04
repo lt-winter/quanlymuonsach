@@ -75,6 +75,17 @@
           </router-link>
         </li>
 
+        <li class="nav-item">
+          <router-link
+            :to="{ name: 'reports' }"
+            class="nav-link nav-link-custom"
+            @click="isNavOpen = false"
+          >
+            <i class="fas fa-chart-line"></i>
+            <span>Báo cáo</span>
+          </router-link>
+        </li>
+
         <li class="nav-item" v-if="user && user.role === 'superadmin'">
           <span class="nav-divider"></span>
         </li>

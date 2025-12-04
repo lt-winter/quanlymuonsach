@@ -65,16 +65,18 @@
         </div>
       </router-link>
 
-      <div class="feature-card coming-soon">
+      <router-link :to="{ name: 'reports' }" class="feature-card">
         <div class="feature-icon reports">
           <i class="fas fa-chart-bar"></i>
         </div>
         <div class="feature-content">
           <h3>Báo cáo & Thống kê</h3>
           <p>Xem các báo cáo về hoạt động thư viện</p>
-          <span class="badge-coming-soon">Sắp ra mắt</span>
         </div>
-      </div>
+        <div class="feature-arrow">
+          <i class="fas fa-arrow-right"></i>
+        </div>
+      </router-link>
     </div>
 
     <div class="info-section">

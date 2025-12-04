@@ -34,6 +34,13 @@ const routes = [
       ...borrowRoutes,
       ...employeeRoutes,
 
+      // Trang báo cáo thống kê
+      {
+        path: "reports",
+        name: "reports",
+        component: () => import("@/views/reports/Dashboard.vue"),
+      },
+
       // Trang mặc định
       {
         path: "",

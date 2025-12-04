@@ -14,6 +14,7 @@ const publisherAdminRoutes = require("./app/routes/admin/publisher.route");
 const bookAdminRoutes = require("./app/routes/admin/book.route");
 const borrowAdminRoutes = require("./app/routes/admin/borrow.route");
 const employeeAdminRoutes = require("./app/routes/admin/employee.route");
+const reportAdminRoutes = require("./app/routes/admin/report.route");
 
 const auth = require("./app/middlewares/auth");
 const superadmin = require("./app/middlewares/superadmin");
@@ -45,6 +46,7 @@ app.use("/api/admin/publishers", auth, superadmin, publisherAdminRoutes);
 app.use("/api/admin/books", auth, superadmin, bookAdminRoutes);
 app.use("/api/admin/borrows", auth, superadmin, borrowAdminRoutes);
 app.use("/api/admin/employees", auth, superadmin, employeeAdminRoutes);
+app.use("/api/admin/reports", auth, superadmin, reportAdminRoutes);
 
 // handle 404 response
 app.use((req, res, next) => {
