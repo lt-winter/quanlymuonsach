@@ -75,8 +75,9 @@ exports.getNewestBooks = async (req, res, next) => {
     const sort = { _id: -1 };
     const limitNum = parseInt(limit) || 8;
     
-    // Lấy sách mới nhất
-    const documents = await bookService.findWithPagination({}, sort, 0, limitNum);
+    // Lấy sách mới nhất, chỉ lấy sách có số lượng > 1
+    const filter = { soQuyen: { $gt: 1 } };
+    const documents = await bookService.findWithPagination(filter, sort, 0, limitNum);
     
     return res.send({
       data: documents,
