@@ -27,7 +27,10 @@
         <li class="nav-item">
           <router-link :to="{ name: 'home' }" custom v-slot="{ navigate }">
             <a
-              @click="navigate(); isNavOpen = false"
+              @click="
+                navigate();
+                isNavOpen = false;
+              "
               class="nav-link nav-link-custom"
               :class="{ 'active-link': $route.name === 'home' }"
             >
@@ -39,7 +42,10 @@
         <li class="nav-item">
           <router-link :to="{ name: 'books' }" custom v-slot="{ navigate }">
             <a
-              @click="navigate(); isNavOpen = false"
+              @click="
+                navigate();
+                isNavOpen = false;
+              "
               class="nav-link nav-link-custom"
               :class="{
                 'active-link':
@@ -48,22 +54,6 @@
             >
               <i class="fas fa-book"></i>
               <span>Sách</span>
-            </a>
-          </router-link>
-        </li>
-        <li class="nav-item" v-if="user">
-          <router-link
-            :to="{ name: 'my-borrows' }"
-            custom
-            v-slot="{ navigate }"
-          >
-            <a
-              @click="navigate(); isNavOpen = false"
-              class="nav-link nav-link-custom"
-              :class="{ 'active-link': $route.name === 'my-borrows' }"
-            >
-              <i class="fas fa-clipboard-list"></i>
-              <span>Sách đã mượn</span>
             </a>
           </router-link>
         </li>
@@ -135,6 +125,17 @@
               >
                 <i class="fas fa-user"></i>
                 <span>Thông tin cá nhân</span>
+              </router-link>
+            </li>
+
+            <li>
+              <router-link
+                :to="{ name: 'my-borrows' }"
+                class="dropdown-item profile-btn"
+                @click="isNavOpen = false"
+              >
+                <i class="fas fa-clipboard-list"></i>
+                <span>Sách đã mượn</span>
               </router-link>
             </li>
 
