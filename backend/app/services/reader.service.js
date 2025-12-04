@@ -172,6 +172,83 @@ class ReaderService {
     const { matKhau: _, ...readerWithoutPassword } = result;
     return readerWithoutPassword;
   }
+
+  // ==================== NOTIFICATION METHODS ====================
+
+  // Thêm thông báo mới cho độc giả
+  async addNotification(maDocGia, notification) {
+    const { ObjectId } = require("mongodb");
+    
+    const thongBao = {
+      _id: new ObjectId(),
+      tieuDe: notification.tieuDe,
+      noiDung: notification.noiDung,
+      loai: notification.loai, // BORROW_CREATED, BORROW_APPROVED, BORROW_REJECTED, BORROW_RETURNED, BORROW_OVERDUE
+      maMuon: notification.maMuon || null,
+      daDoc: false,
+      ngayTao: new Date(),
+    };
+
+    await this.DocGia.updateOne(
+      { maDocGia },
+      { $push: { thongBao: { $each: [thongBao], $position: 0 } } }
+    );
+
+    return thongBao;
+  }
+
+  // Lấy danh sách thông báo của độc giả
+  async getNotifications(maDocGia) {
+    const reader = await this.DocGia.findOne(
+      { maDocGia },
+      { projection: { thongBao: 1 } }
+    );
+    return reader?.thongBao || [];
+  }
+
+  // Đếm số thông báo chưa đọc
+  async getUnreadCount(maDocGia) {
+    const reader = await this.DocGia.findOne(
+      { maDocGia },
+      { projection: { thongBao: 1 } }
+    );
+    if (!reader?.thongBao) return 0;
+    return reader.thongBao.filter((n) => !n.daDoc).length;
+  }
+
+  // Đánh dấu 1 thông báo đã đọc
+  async markNotificationAsRead(maDocGia, notificationId) {
+    const { ObjectId } = require("mongodb");
+    await this.DocGia.updateOne(
+      { maDocGia, "thongBao._id": new ObjectId(notificationId) },
+      { $set: { "thongBao.$.daDoc": true } }
+    );
+  }
+
+  // Đánh dấu tất cả thông báo đã đọc
+  async markAllNotificationsAsRead(maDocGia) {
+    await this.DocGia.updateOne(
+      { maDocGia },
+      { $set: { "thongBao.$[].daDoc": true } }
+    );
+  }
+
+  // Xóa 1 thông báo
+  async deleteNotification(maDocGia, notificationId) {
+    const { ObjectId } = require("mongodb");
+    await this.DocGia.updateOne(
+      { maDocGia },
+      { $pull: { thongBao: { _id: new ObjectId(notificationId) } } }
+    );
+  }
+
+  // Xóa tất cả thông báo
+  async deleteAllNotifications(maDocGia) {
+    await this.DocGia.updateOne(
+      { maDocGia },
+      { $set: { thongBao: [] } }
+    );
+  }
 }
 
 module.exports = ReaderService;

@@ -1,4 +1,5 @@
 const BorrowService = require("@/services/admin/borrow.service");
+const ReaderService = require("@/services/reader.service");
 const MongoDB = require("@/utils/mongodb.util");
 const ApiError = require("@/api-error");
 
@@ -98,6 +99,20 @@ exports.returnBook = async (req, res, next) => {
     if (!document) {
       return next(new ApiError(404, "Không tìm thấy phiếu mượn"));
     }
+    
+    // Gửi thông báo cho độc giả
+    try {
+      const readerService = new ReaderService(MongoDB.client);
+      await readerService.addNotification(document.maDocGia, {
+        tieuDe: "Trả sách thành công",
+        noiDung: `Bạn đã trả sách "${document.sach?.tenSach || 'Unknown'}" thành công.`,
+        loai: "BORROW_RETURNED",
+        maMuon: document.maMuon,
+      });
+    } catch (notifError) {
+      // Không throw lỗi notification để không ảnh hưởng flow chính
+    }
+    
     return res.send(document);
   } catch (error) {
     return next(new ApiError(500, `Lỗi khi trả sách: ${error.message}`));
@@ -168,6 +183,20 @@ exports.approve = async (req, res, next) => {
     if (!document) {
       return next(new ApiError(404, "Không tìm thấy phiếu mượn"));
     }
+    
+    // Gửi thông báo cho độc giả
+    try {
+      const readerService = new ReaderService(MongoDB.client);
+      await readerService.addNotification(document.maDocGia, {
+        tieuDe: "Phiếu mượn được duyệt",
+        noiDung: `Phiếu mượn sách "${document.sach?.tenSach || 'Unknown'}" của bạn đã được duyệt. Vui lòng đến thư viện để nhận sách.`,
+        loai: "BORROW_APPROVED",
+        maMuon: document.maMuon,
+      });
+    } catch (notifError) {
+      // Không throw lỗi notification để không ảnh hưởng flow chính
+    }
+    
     return res.send(document);
   } catch (error) {
     return next(
@@ -187,6 +216,21 @@ exports.reject = async (req, res, next) => {
     if (!document) {
       return next(new ApiError(404, "Không tìm thấy phiếu mượn"));
     }
+    
+    // Gửi thông báo cho độc giả
+    try {
+      const readerService = new ReaderService(MongoDB.client);
+      const lyDoText = lyDo ? ` Lý do: ${lyDo}` : "";
+      await readerService.addNotification(document.maDocGia, {
+        tieuDe: "Phiếu mượn bị từ chối",
+        noiDung: `Phiếu mượn sách "${document.sach?.tenSach || 'Unknown'}" của bạn đã bị từ chối.${lyDoText}`,
+        loai: "BORROW_REJECTED",
+        maMuon: document.maMuon,
+      });
+    } catch (notifError) {
+      // Không throw lỗi notification để không ảnh hưởng flow chính
+    }
+    
     return res.send(document);
   } catch (error) {
     return next(

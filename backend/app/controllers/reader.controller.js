@@ -166,7 +166,6 @@ exports.login = async (req, res, next) => {
       token,
     });
   } catch (error) {
-    console.error(error);
     return next(new ApiError(500, "Lỗi khi đăng nhập"));
   }
 };
@@ -243,7 +242,6 @@ exports.getProfile = async (req, res, next) => {
 
     return res.send(profile);
   } catch (error) {
-    console.error(error);
     return next(new ApiError(500, "Lỗi khi lấy thông tin profile"));
   }
 };
@@ -266,8 +264,62 @@ exports.updateProfile = async (req, res, next) => {
       data: updatedProfile,
     });
   } catch (error) {
-    console.error(error);
     return next(new ApiError(500, "Lỗi khi cập nhật profile"));
+  }
+};
+
+// ==================== NOTIFICATION ENDPOINTS ====================
+
+exports.getNotifications = async (req, res, next) => {
+  try {
+    const readerService = new ReaderService(MongoDB.client);
+    const notifications = await readerService.getNotifications(req.user.maDocGia);
+    const unreadCount = notifications.filter((n) => !n.daDoc).length;
+    return res.send({ notifications, unreadCount });
+  } catch (error) {
+    return next(new ApiError(500, "Lỗi khi lấy thông báo"));
+  }
+};
+
+exports.markNotificationAsRead = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const readerService = new ReaderService(MongoDB.client);
+    await readerService.markNotificationAsRead(req.user.maDocGia, id);
+    return res.send({ message: "Đã đánh dấu đã đọc" });
+  } catch (error) {
+    return next(new ApiError(500, "Lỗi khi đánh dấu đã đọc"));
+  }
+};
+
+exports.markAllNotificationsAsRead = async (req, res, next) => {
+  try {
+    const readerService = new ReaderService(MongoDB.client);
+    await readerService.markAllNotificationsAsRead(req.user.maDocGia);
+    return res.send({ message: "Đã đánh dấu tất cả đã đọc" });
+  } catch (error) {
+    return next(new ApiError(500, "Lỗi khi đánh dấu tất cả đã đọc"));
+  }
+};
+
+exports.deleteNotification = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const readerService = new ReaderService(MongoDB.client);
+    await readerService.deleteNotification(req.user.maDocGia, id);
+    return res.send({ message: "Đã xóa thông báo" });
+  } catch (error) {
+    return next(new ApiError(500, "Lỗi khi xóa thông báo"));
+  }
+};
+
+exports.deleteAllNotifications = async (req, res, next) => {
+  try {
+    const readerService = new ReaderService(MongoDB.client);
+    await readerService.deleteAllNotifications(req.user.maDocGia);
+    return res.send({ message: "Đã xóa tất cả thông báo" });
+  } catch (error) {
+    return next(new ApiError(500, "Lỗi khi xóa tất cả thông báo"));
   }
 };
 

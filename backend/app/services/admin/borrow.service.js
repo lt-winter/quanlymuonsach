@@ -133,7 +133,7 @@ class BorrowService {
     const borrow = await this.TheoDoiMuonSach.findOne(query);
     if (!borrow) return null;
     
-    const result = await this.TheoDoiMuonSach.findOneAndUpdate(
+    await this.TheoDoiMuonSach.findOneAndUpdate(
       query,
       {
         $set: {
@@ -154,7 +154,8 @@ class BorrowService {
       );
     }
     
-    return result?.value || result;
+    // Trả về document với đầy đủ thông tin lookup (sách, độc giả, nhân viên)
+    return await this.findById(borrow.maMuon);
   }
 
   // Admin từ chối phiếu mượn
@@ -164,7 +165,11 @@ class BorrowService {
     // Convert to ObjectId if valid
     const query = ObjectId.isValid(id) ? { _id: new ObjectId(id) } : { maMuon: id };
     
-    const result = await this.TheoDoiMuonSach.findOneAndUpdate(
+    // Lấy thông tin phiếu mượn trước
+    const borrow = await this.TheoDoiMuonSach.findOne(query);
+    if (!borrow) return null;
+    
+    await this.TheoDoiMuonSach.findOneAndUpdate(
       query,
       {
         $set: {
@@ -178,7 +183,8 @@ class BorrowService {
       { returnDocument: "after" }
     );
     
-    return result?.value || result;
+    // Trả về document với đầy đủ thông tin lookup (sách, độc giả, nhân viên)
+    return await this.findById(borrow.maMuon);
   }
 
   // Lấy tất cả bản ghi mượn sách (join với độc giả, sách, người tạo, người duyệt)

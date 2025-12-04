@@ -1,4 +1,5 @@
 const BorrowService = require("../services/borrow.service");
+const ReaderService = require("../services/reader.service");
 const MongoDB = require("../utils/mongodb.util");
 const ApiError = require("../api-error");
 
@@ -39,6 +40,20 @@ exports.borrowBook = async (req, res, next) => {
       req.body.maSach,
       req.body.ngayMuon,
     );
+    
+    // Gửi thông báo cho độc giả
+    try {
+      const readerService = new ReaderService(MongoDB.client);
+      await readerService.addNotification(req.body.maDocGia, {
+        tieuDe: "Tạo phiếu mượn thành công",
+        noiDung: `Bạn đã tạo phiếu mượn sách thành công. Vui lòng chờ nhân viên thư viện duyệt.`,
+        loai: "BORROW_CREATED",
+        maMuon: borrowRecord.maMuon,
+      });
+    } catch (notifError) {
+      // Không throw lỗi notification để không ảnh hưởng flow chính
+    }
+    
     return res.send(borrowRecord);
   } catch (error) {
     return next(new ApiError(500, "Lỗi khi cho độc giả mượn sách"));
@@ -117,7 +132,6 @@ exports.getMyBorrows = async (req, res, next) => {
     );
     return res.send(records);
   } catch (error) {
-    console.error("Error in getMyBorrows:", error);
     return next(
       new ApiError(500, "Lỗi khi lấy danh sách sách đã mượn: " + error.message),
     );

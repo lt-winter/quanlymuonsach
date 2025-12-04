@@ -40,7 +40,6 @@ exports.login = async (req, res, next) => {
       token,
     });
   } catch (error) {
-    console.error(error);
     return next(new ApiError(500, "Lỗi khi đăng nhập"));
   }
 };
@@ -55,7 +54,6 @@ exports.create = async (req, res, next) => {
     const document = await employeeService.create(req.body);
     return res.send(document);
   } catch (error) {
-    console.error(error);
     return next(new ApiError(500, "Lỗi khi tạo nhân viên: " + error.message));
   }
 };
@@ -66,7 +64,6 @@ exports.findAll = async (req, res, next) => {
     const documents = await employeeService.find({});
     return res.send(documents);
   } catch (error) {
-    console.error(error);
     return next(new ApiError(500, "Lỗi khi truy xuất danh sách nhân viên"));
   }
 };
@@ -82,7 +79,6 @@ exports.findOne = async (req, res, next) => {
 
     return res.send(document);
   } catch (error) {
-    console.error(error);
     return next(new ApiError(500, "Lỗi khi truy xuất nhân viên"));
   }
 };
@@ -101,7 +97,6 @@ exports.update = async (req, res, next) => {
 
     return res.send(document);
   } catch (error) {
-    console.error(error);
     return next(new ApiError(500, "Lỗi khi cập nhật nhân viên"));
   }
 };
@@ -117,7 +112,6 @@ exports.delete = async (req, res, next) => {
 
     return res.send({ message: "Nhân viên đã được xóa thành công" });
   } catch (error) {
-    console.error(error);
     return next(new ApiError(500, "Lỗi khi xóa nhân viên"));
   }
 };
