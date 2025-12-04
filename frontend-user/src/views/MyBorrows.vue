@@ -23,7 +23,46 @@
       </div>
 
       <div v-else>
-        <div class="borrow-table-container">
+        <div class="filter-bar mb-4">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="input-group shadow-sm">
+                <span class="input-group-text bg-white border-end-0">
+                  <i class="fas fa-search text-muted"></i>
+                </span>
+                <input
+                  type="text"
+                  class="form-control border-start-0 ps-0"
+                  placeholder="Tìm kiếm theo tên sách..."
+                  v-model="searchQuery"
+                />
+              </div>
+            </div>
+            <div class="col-md-4">
+              <select class="form-select shadow-sm" v-model="filterStatus">
+                <option value="">Tất cả trạng thái</option>
+                <option value="choDuyet">Chờ duyệt</option>
+                <option value="dangMuon">Đang mượn</option>
+                <option value="quaHan">Quá hạn</option>
+                <option value="daTra">Đã trả</option>
+                <option value="matSach">Mất sách</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div
+          v-if="filteredBorrows.length === 0"
+          class="text-center py-5 text-muted"
+        >
+          <i
+            class="fas fa-search mb-3"
+            style="font-size: 2rem; opacity: 0.5"
+          ></i>
+          <p>Không tìm thấy phiếu mượn nào phù hợp.</p>
+        </div>
+
+        <div v-else class="borrow-table-container">
           <div class="table-responsive">
             <table class="table mb-0">
               <thead>
@@ -36,8 +75,8 @@
                 </tr>
               </thead>
               <tbody>
-                <tr 
-                  v-for="(borrow, index) in borrows" 
+                <tr
+                  v-for="(borrow, index) in filteredBorrows"
                   :key="borrow._id || borrow.maMuon"
                   @click="goToDetail(borrow.maMuon)"
                   class="borrow-row"
@@ -83,7 +122,42 @@ export default {
     return {
       borrows: [],
       loading: false,
+      searchQuery: "",
+      filterStatus: "",
     };
+  },
+  computed: {
+    filteredBorrows() {
+      return this.borrows.filter((borrow) => {
+        const bookTitle = borrow.sach?.tenSach?.toLowerCase() || "";
+        const matchesSearch = bookTitle.includes(this.searchQuery.toLowerCase());
+
+        let matchesFilter = true;
+        if (this.filterStatus) {
+          switch (this.filterStatus) {
+            case "choDuyet":
+              matchesFilter = borrow.trangThai === "choDuyet";
+              break;
+            case "dangMuon":
+              matchesFilter =
+                borrow.trangThai === "dangMuon" && !this.isOverdue(borrow);
+              break;
+            case "quaHan":
+              matchesFilter =
+                borrow.trangThai === "dangMuon" && this.isOverdue(borrow);
+              break;
+            case "daTra":
+              matchesFilter = borrow.trangThai === "daTraSach";
+              break;
+            case "matSach":
+              matchesFilter = borrow.trangThai === "matSach";
+              break;
+          }
+        }
+
+        return matchesSearch && matchesFilter;
+      });
+    },
   },
   methods: {
     async fetchBorrows() {

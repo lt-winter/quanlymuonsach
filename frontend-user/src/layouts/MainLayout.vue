@@ -2,7 +2,7 @@
   <div class="main-layout">
     <AppHeader />
     <main class="main-content">
-      <div class="container py-4">
+      <div :class="containerClass">
         <router-view />
       </div>
     </main>
@@ -18,6 +18,13 @@ export default {
   components: {
     AppHeader,
     AppFooter,
+  },
+  computed: {
+    containerClass() {
+      return this.$route.name === "books"
+        ? "container-fluid px-4 py-4"
+        : "container py-4";
+    },
   },
 };
 </script>

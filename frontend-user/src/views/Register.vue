@@ -1,73 +1,160 @@
 <template>
-  <div>
-    <h3 class="text-center mb-4">Đăng ký tài khoản</h3>
+  <div class="register-content">
+    <div class="text-center mb-4">
+      <h3 class="form-title">Đăng ký tài khoản</h3>
+      <p class="text-muted">Trở thành thành viên của thư viện ngay hôm nay</p>
+    </div>
 
-    <Form :validation-schema="schema" @submit="handleRegister">
-      <div class="mb-3">
-        <label class="form-label">Họ và tên lót</label>
-        <Field name="hoLot" class="form-control" />
-        <ErrorMessage name="hoLot" class="text-danger small" />
+    <Form
+      :validation-schema="schema"
+      @submit="handleRegister"
+      class="register-form"
+    >
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Họ và tên lót</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-user"></i></span>
+            <Field
+              name="hoLot"
+              class="form-control"
+              placeholder="Họ và tên lót"
+            />
+          </div>
+          <ErrorMessage name="hoLot" class="error-feedback" />
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Tên</label>
+          <div class="input-group">
+            <span class="input-group-text"
+              ><i class="fas fa-signature"></i
+            ></span>
+            <Field name="ten" class="form-control" placeholder="Tên" />
+          </div>
+          <ErrorMessage name="ten" class="error-feedback" />
+        </div>
       </div>
 
-      <div class="mb-3">
-        <label class="form-label">Tên</label>
-        <Field name="ten" class="form-control" />
-        <ErrorMessage name="ten" class="text-danger small" />
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">Ngày sinh</label>
-        <Field name="ngaySinh" type="date" class="form-control" />
-        <ErrorMessage name="ngaySinh" class="text-danger small" />
-      </div>
-
-      <div class="mb-3">
-        <label class="form-label">Phái</label>
-        <CustomSelect
-          v-model="formData.phai"
-          :options="phaiOptions"
-          placeholder="-- Chọn phái --"
-        />
-        <ErrorMessage name="phai" class="text-danger small" />
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Ngày sinh</label>
+          <div class="input-group">
+            <span class="input-group-text"
+              ><i class="fas fa-calendar-alt"></i
+            ></span>
+            <Field name="ngaySinh" type="date" class="form-control" />
+          </div>
+          <ErrorMessage name="ngaySinh" class="error-feedback" />
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Phái</label>
+          <Field name="phai" v-model="formData.phai">
+            <template v-slot="{ field, errorMessage }">
+              <CustomSelect
+                v-bind="field"
+                :options="phaiOptions"
+                placeholder="Chọn phái"
+                :class="{ 'is-invalid': errorMessage }"
+              />
+            </template>
+          </Field>
+          <ErrorMessage name="phai" class="error-feedback" />
+        </div>
       </div>
 
       <div class="mb-3">
         <label class="form-label">Địa chỉ</label>
-        <Field name="diaChi" class="form-control" />
-        <ErrorMessage name="diaChi" class="text-danger small" />
+        <div class="input-group">
+          <span class="input-group-text"
+            ><i class="fas fa-map-marker-alt"></i
+          ></span>
+          <Field
+            name="diaChi"
+            class="form-control"
+            placeholder="Nhập địa chỉ đầy đủ"
+          />
+        </div>
+        <ErrorMessage name="diaChi" class="error-feedback" />
       </div>
 
       <div class="mb-3">
         <label class="form-label">Số điện thoại</label>
-        <Field name="dienThoai" class="form-control" />
-        <ErrorMessage name="dienThoai" class="text-danger small" />
+        <div class="input-group">
+          <span class="input-group-text"><i class="fas fa-phone"></i></span>
+          <Field
+            name="dienThoai"
+            class="form-control"
+            placeholder="Nhập số điện thoại"
+          />
+        </div>
+        <ErrorMessage name="dienThoai" class="error-feedback" />
       </div>
 
-      <div class="mb-3">
-        <label class="form-label">Mật khẩu</label>
-        <Field name="password" type="password" class="form-control" />
-        <ErrorMessage name="password" class="text-danger small" />
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Mật khẩu</label>
+          <div class="input-group">
+            <span class="input-group-text"><i class="fas fa-lock"></i></span>
+            <Field
+              name="password"
+              type="password"
+              class="form-control"
+              placeholder="Mật khẩu"
+            />
+          </div>
+          <ErrorMessage name="password" class="error-feedback" />
+        </div>
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Xác nhận</label>
+          <div class="input-group">
+            <span class="input-group-text"
+              ><i class="fas fa-check-circle"></i
+            ></span>
+            <Field
+              name="confirmPassword"
+              type="password"
+              class="form-control"
+              placeholder="Nhập lại"
+            />
+          </div>
+          <ErrorMessage name="confirmPassword" class="error-feedback" />
+        </div>
       </div>
 
-      <div class="mb-3">
-        <label class="form-label">Xác nhận mật khẩu</label>
-        <Field name="confirmPassword" type="password" class="form-control" />
-        <ErrorMessage name="confirmPassword" class="text-danger small" />
-      </div>
-
-      <button class="btn btn-primary w-100" :disabled="loading">
-        <span v-if="loading" class="spinner-border spinner-border-sm"></span>
-        Đăng ký
+      <button
+        class="btn btn-primary w-100 btn-register mt-2"
+        :disabled="loading"
+      >
+        <span
+          v-if="loading"
+          class="spinner-border spinner-border-sm me-2"
+        ></span>
+        {{ loading ? "Đang đăng ký..." : "Đăng ký tài khoản" }}
       </button>
     </Form>
 
-    <p class="text-danger text-center mt-2">{{ error }}</p>
-    <p class="text-success text-center mt-2">{{ success }}</p>
+    <div
+      v-if="error"
+      class="alert alert-danger mt-3 d-flex align-items-center"
+      role="alert"
+    >
+      <i class="fas fa-exclamation-circle me-2"></i>
+      <div>{{ error }}</div>
+    </div>
 
-    <p class="text-center mt-3">
+    <div
+      v-if="success"
+      class="alert alert-success mt-3 d-flex align-items-center"
+      role="alert"
+    >
+      <i class="fas fa-check-circle me-2"></i>
+      <div>{{ success }}</div>
+    </div>
+
+    <div class="text-center mt-4 footer-text">
       Đã có tài khoản?
-      <router-link to="/login">Đăng nhập</router-link>
-    </p>
+      <router-link to="/login" class="login-link">Đăng nhập</router-link>
+    </div>
   </div>
 </template>
 
@@ -101,7 +188,10 @@ export default {
         diaChi: Yup.string().required("Vui lòng nhập địa chỉ"),
         dienThoai: Yup.string()
           .required("Vui lòng nhập số điện thoại")
-          .matches(/((09|03|07|08|05)+([0-9]{8})\b)/g, "Số điện thoại không hợp lệ"),
+          .matches(
+            /((09|03|07|08|05)+([0-9]{8})\b)/g,
+            "Số điện thoại không hợp lệ"
+          ),
         password: Yup.string()
           .required("Vui lòng nhập mật khẩu")
           .min(6, "Mật khẩu ít nhất 6 ký tự"),
@@ -135,3 +225,80 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.form-title {
+  font-weight: 700;
+  color: #1f2937;
+}
+
+.input-group-text {
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-right: none;
+  color: #6b7280;
+  width: 45px;
+  justify-content: center;
+}
+
+.form-control {
+  border: 1px solid #e5e7eb;
+  border-left: none;
+  padding: 10px 15px;
+  font-size: 0.95rem;
+}
+
+.form-control:focus {
+  box-shadow: none;
+  border-color: #4361ee;
+}
+
+.input-group:focus-within .input-group-text {
+  border-color: #4361ee;
+  color: #4361ee;
+  background-color: #eff6ff;
+}
+
+.btn-register {
+  background: linear-gradient(135deg, #4361ee, #7209b7);
+  border: none;
+  padding: 12px;
+  font-weight: 600;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.btn-register:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+}
+
+.btn-register:disabled {
+  opacity: 0.7;
+  transform: none;
+}
+
+.login-link {
+  color: #4361ee;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.login-link:hover {
+  color: #3b82f6;
+  text-decoration: underline;
+}
+
+.error-feedback {
+  color: #ef476f;
+  font-size: 0.8rem;
+  margin-top: 5px;
+  display: block;
+}
+
+.footer-text {
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+</style>

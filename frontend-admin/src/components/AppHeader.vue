@@ -1,96 +1,139 @@
 <template>
-  <nav class="navbar navbar-expand navbar-dark sticky-top px-4 custom-navbar">
+  <nav
+    class="navbar navbar-expand-lg navbar-dark sticky-top px-4 custom-navbar"
+  >
     <router-link to="/" class="navbar-brand d-flex align-items-center">
       <i class="fas fa-book-reader brand-icon mr-2"></i>
       <span class="brand-text">Quản lý Thư viện</span>
     </router-link>
-    
-    <ul class="navbar-nav mx-auto nav-menu">
-      <li class="nav-item">
-        <router-link :to="{ name: 'readers' }" class="nav-link nav-link-custom">
-          <i class="fas fa-users"></i>
-          <span>Độc giả</span>
-        </router-link>
-      </li>
-      <li class="nav-item">
-        <router-link :to="{ name: 'publishers' }" class="nav-link nav-link-custom">
-          <i class="fas fa-building"></i>
-          <span>Nhà xuất bản</span>
-        </router-link>
-      </li>
-      <li class="nav-item">
-        <router-link :to="{ name: 'books' }" class="nav-link nav-link-custom">
-          <i class="fas fa-book"></i>
-          <span>Sách</span>
-        </router-link>
-      </li>
-      <li class="nav-item">
-        <router-link :to="{ name: 'borrows' }" class="nav-link nav-link-custom">
-          <i class="fas fa-book-reader"></i>
-          <span>Mượn sách</span>
-        </router-link>
-      </li>
-      <li class="nav-item">
-        <router-link :to="{ name: 'borrows.approval' }" class="nav-link nav-link-custom">
-          <i class="fas fa-check-circle"></i>
-          <span>Duyệt phiếu</span>
-        </router-link>
-      </li>
 
-      <li class="nav-item" v-if="user && user.role === 'superadmin'">
-        <span class="nav-divider"></span>
-      </li>
+    <button
+      class="navbar-toggler"
+      type="button"
+      @click="isNavOpen = !isNavOpen"
+      aria-controls="adminNavbar"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-      <li class="nav-item" v-if="user && user.role === 'superadmin'">
-        <router-link :to="{ name: 'employees' }" class="nav-link nav-link-custom">
-          <i class="fas fa-user-cog"></i>
-          <span>Nhân viên</span>
-        </router-link>
-      </li>
-    </ul>
+    <div
+      class="collapse navbar-collapse"
+      :class="{ show: isNavOpen }"
+      id="adminNavbar"
+    >
+      <ul class="navbar-nav mx-auto nav-menu">
+        <li class="nav-item">
+          <router-link
+            :to="{ name: 'readers' }"
+            class="nav-link nav-link-custom"
+            @click="isNavOpen = false"
+          >
+            <i class="fas fa-users"></i>
+            <span>Độc giả</span>
+          </router-link>
+        </li>
+        <li class="nav-item">
+          <router-link
+            :to="{ name: 'publishers' }"
+            class="nav-link nav-link-custom"
+            @click="isNavOpen = false"
+          >
+            <i class="fas fa-building"></i>
+            <span>Nhà xuất bản</span>
+          </router-link>
+        </li>
+        <li class="nav-item">
+          <router-link
+            :to="{ name: 'books' }"
+            class="nav-link nav-link-custom"
+            @click="isNavOpen = false"
+          >
+            <i class="fas fa-book"></i>
+            <span>Sách</span>
+          </router-link>
+        </li>
+        <li class="nav-item">
+          <router-link
+            :to="{ name: 'borrows' }"
+            class="nav-link nav-link-custom"
+            @click="isNavOpen = false"
+          >
+            <i class="fas fa-book-reader"></i>
+            <span>Mượn sách</span>
+          </router-link>
+        </li>
+        <li class="nav-item">
+          <router-link
+            :to="{ name: 'borrows.approval' }"
+            class="nav-link nav-link-custom"
+            @click="isNavOpen = false"
+          >
+            <i class="fas fa-check-circle"></i>
+            <span>Duyệt phiếu</span>
+          </router-link>
+        </li>
 
-    <ul class="navbar-nav" v-if="user">
-      <li class="nav-item dropdown">
-        <a
-          class="nav-link dropdown-toggle user-dropdown"
-          href="#"
-          role="button"
-          data-toggle="dropdown"
-          aria-expanded="false"
-        >
-          <div class="user-avatar">
-            <i class="fas fa-user"></i>
-          </div>
-          <span class="user-name">{{ user.username }}</span>
-        </a>
+        <li class="nav-item" v-if="user && user.role === 'superadmin'">
+          <span class="nav-divider"></span>
+        </li>
 
-        <ul
-          class="dropdown-menu dropdown-menu-right dropdown-menu-custom"
-          data-display="static"
-        >
-          <li class="dropdown-header">
-            <div class="user-info">
-              <div class="user-avatar-large">
-                <i class="fas fa-user"></i>
-              </div>
-              <div class="user-details">
-                <strong>{{ user.fullName }}</strong>
-                <small>{{ user.username }}</small>
-              </div>
+        <li class="nav-item" v-if="user && user.role === 'superadmin'">
+          <router-link
+            :to="{ name: 'employees' }"
+            class="nav-link nav-link-custom"
+            @click="isNavOpen = false"
+          >
+            <i class="fas fa-user-cog"></i>
+            <span>Nhân viên</span>
+          </router-link>
+        </li>
+      </ul>
+
+      <ul class="navbar-nav" v-if="user">
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle user-dropdown"
+            href="#"
+            role="button"
+            data-toggle="dropdown"
+            aria-expanded="false"
+          >
+            <div class="user-avatar">
+              <i class="fas fa-user"></i>
             </div>
-          </li>
+            <span class="user-name">{{ user.username }}</span>
+          </a>
 
-          <li><hr class="dropdown-divider" /></li>
+          <ul
+            class="dropdown-menu dropdown-menu-right dropdown-menu-custom"
+            data-display="static"
+          >
+            <li class="dropdown-header">
+              <div class="user-info">
+                <div class="user-avatar-large">
+                  <i class="fas fa-user"></i>
+                </div>
+                <div class="user-details">
+                  <strong>{{ user.fullName }}</strong>
+                  <small>{{ user.username }}</small>
+                </div>
+              </div>
+            </li>
 
-          <li>
-            <button class="dropdown-item logout-btn" @click="logout">
-              <i class="fas fa-sign-out-alt"></i>
-              <span>Đăng xuất</span>
-            </button>
-          </li>
-        </ul>
-      </li>
-    </ul>
+            <li><hr class="dropdown-divider" /></li>
+
+            <li>
+              <button class="dropdown-item logout-btn" @click="logout">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Đăng xuất</span>
+              </button>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
   </nav>
 </template>
 
@@ -99,6 +142,7 @@ export default {
   data() {
     return {
       user: JSON.parse(localStorage.getItem("admin_user")) || null,
+      isNavOpen: false,
     };
   },
   methods: {

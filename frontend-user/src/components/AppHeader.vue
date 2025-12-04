@@ -1,124 +1,153 @@
 <template>
-  <nav class="navbar navbar-expand navbar-dark sticky-top px-4 custom-navbar">
+  <nav
+    class="navbar navbar-expand-lg navbar-dark sticky-top px-4 custom-navbar"
+  >
     <router-link to="/" class="navbar-brand d-flex align-items-center">
       <i class="fa-solid fa-snowflake brand-icon mr-2"></i>
       <span class="brand-text">WinterLibrary</span>
     </router-link>
 
-    <ul class="navbar-nav mx-auto nav-menu">
-      <li class="nav-item">
-        <router-link :to="{ name: 'home' }" custom v-slot="{ navigate }">
-          <a
-            @click="navigate"
-            class="nav-link nav-link-custom"
-            :class="{ 'active-link': $route.name === 'home' }"
-          >
-            <i class="fas fa-home"></i>
-            <span>Trang chủ</span>
-          </a>
-        </router-link>
-      </li>
-      <li class="nav-item">
-        <router-link :to="{ name: 'books' }" custom v-slot="{ navigate }">
-          <a
-            @click="navigate"
-            class="nav-link nav-link-custom"
-            :class="{
-              'active-link':
-                $route.name === 'books' || $route.name === 'book.detail',
-            }"
-          >
-            <i class="fas fa-book"></i>
-            <span>Sách</span>
-          </a>
-        </router-link>
-      </li>
-      <li class="nav-item" v-if="user">
-        <router-link :to="{ name: 'my-borrows' }" custom v-slot="{ navigate }">
-          <a
-            @click="navigate"
-            class="nav-link nav-link-custom"
-            :class="{ 'active-link': $route.name === 'my-borrows' }"
-          >
-            <i class="fas fa-clipboard-list"></i>
-            <span>Sách đã mượn</span>
-          </a>
-        </router-link>
-      </li>
-    </ul>
+    <button
+      class="navbar-toggler"
+      type="button"
+      @click="isNavOpen = !isNavOpen"
+      aria-controls="navbarNav"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
 
-    <ul class="navbar-nav">
-      <!-- Chưa đăng nhập -->
-      <template v-if="!user">
+    <div
+      class="collapse navbar-collapse"
+      :class="{ show: isNavOpen }"
+      id="navbarNav"
+    >
+      <ul class="navbar-nav mx-auto nav-menu">
         <li class="nav-item">
-          <router-link :to="{ name: 'login' }" class="nav-link nav-link-custom">
-            <i class="fas fa-sign-in-alt"></i>
-            <span>Đăng nhập</span>
-          </router-link>
-        </li>
-        <li class="nav-item">
-          <router-link
-            :to="{ name: 'register' }"
-            class="nav-link nav-link-custom"
-          >
-            <i class="fas fa-user-plus"></i>
-            <span>Đăng ký</span>
-          </router-link>
-        </li>
-      </template>
-
-      <!-- Đã đăng nhập -->
-      <li v-else class="nav-item dropdown">
-        <a
-          class="nav-link dropdown-toggle user-dropdown"
-          href="#"
-          role="button"
-          data-toggle="dropdown"
-          aria-expanded="false"
-        >
-          <div class="user-avatar">
-            <i class="fas fa-user"></i>
-          </div>
-          <span class="user-name">{{ user.hoLot }} {{ user.ten }}</span>
-        </a>
-
-        <ul
-          class="dropdown-menu dropdown-menu-right dropdown-menu-custom"
-          data-display="static"
-        >
-          <li class="dropdown-header">
-            <div class="user-info">
-              <div class="user-avatar-large">
-                <i class="fas fa-user"></i>
-              </div>
-              <div class="user-details">
-                <strong>{{ user.hoLot }} {{ user.ten }}</strong>
-                <small>{{ user.dienThoai }}</small>
-              </div>
-            </div>
-          </li>
-
-          <li><hr class="dropdown-divider" /></li>
-
-          <li>
-            <router-link
-              :to="{ name: 'profile' }"
-              class="dropdown-item profile-btn"
+          <router-link :to="{ name: 'home' }" custom v-slot="{ navigate }">
+            <a
+              @click="navigate(); isNavOpen = false"
+              class="nav-link nav-link-custom"
+              :class="{ 'active-link': $route.name === 'home' }"
             >
-              <i class="fas fa-user"></i>
-              <span>Thông tin cá nhân</span>
+              <i class="fas fa-home"></i>
+              <span>Trang chủ</span>
+            </a>
+          </router-link>
+        </li>
+        <li class="nav-item">
+          <router-link :to="{ name: 'books' }" custom v-slot="{ navigate }">
+            <a
+              @click="navigate(); isNavOpen = false"
+              class="nav-link nav-link-custom"
+              :class="{
+                'active-link':
+                  $route.name === 'books' || $route.name === 'book.detail',
+              }"
+            >
+              <i class="fas fa-book"></i>
+              <span>Sách</span>
+            </a>
+          </router-link>
+        </li>
+        <li class="nav-item" v-if="user">
+          <router-link
+            :to="{ name: 'my-borrows' }"
+            custom
+            v-slot="{ navigate }"
+          >
+            <a
+              @click="navigate(); isNavOpen = false"
+              class="nav-link nav-link-custom"
+              :class="{ 'active-link': $route.name === 'my-borrows' }"
+            >
+              <i class="fas fa-clipboard-list"></i>
+              <span>Sách đã mượn</span>
+            </a>
+          </router-link>
+        </li>
+      </ul>
+
+      <ul class="navbar-nav">
+        <!-- Chưa đăng nhập -->
+        <template v-if="!user">
+          <li class="nav-item">
+            <router-link
+              :to="{ name: 'login' }"
+              class="nav-link nav-link-custom"
+              @click="isNavOpen = false"
+            >
+              <i class="fas fa-sign-in-alt"></i>
+              <span>Đăng nhập</span>
             </router-link>
           </li>
-
-          <li>
-            <button class="dropdown-item logout-btn" @click="logout">
-              <i class="fas fa-sign-out-alt"></i>
-              <span>Đăng xuất</span>
-            </button>
+          <li class="nav-item">
+            <router-link
+              :to="{ name: 'register' }"
+              class="nav-link nav-link-custom"
+              @click="isNavOpen = false"
+            >
+              <i class="fas fa-user-plus"></i>
+              <span>Đăng ký</span>
+            </router-link>
           </li>
-        </ul>
-      </li>
-    </ul>
+        </template>
+
+        <!-- Đã đăng nhập -->
+        <li v-else class="nav-item dropdown">
+          <a
+            class="nav-link dropdown-toggle user-dropdown"
+            href="#"
+            role="button"
+            data-toggle="dropdown"
+            aria-expanded="false"
+          >
+            <div class="user-avatar">
+              <i class="fas fa-user"></i>
+            </div>
+            <span class="user-name">{{ user.hoLot }} {{ user.ten }}</span>
+          </a>
+
+          <ul
+            class="dropdown-menu dropdown-menu-right dropdown-menu-custom"
+            data-display="static"
+          >
+            <li class="dropdown-header">
+              <div class="user-info">
+                <div class="user-avatar-large">
+                  <i class="fas fa-user"></i>
+                </div>
+                <div class="user-details">
+                  <strong>{{ user.hoLot }} {{ user.ten }}</strong>
+                  <small>{{ user.dienThoai }}</small>
+                </div>
+              </div>
+            </li>
+
+            <li><hr class="dropdown-divider" /></li>
+
+            <li>
+              <router-link
+                :to="{ name: 'profile' }"
+                class="dropdown-item profile-btn"
+                @click="isNavOpen = false"
+              >
+                <i class="fas fa-user"></i>
+                <span>Thông tin cá nhân</span>
+              </router-link>
+            </li>
+
+            <li>
+              <button class="dropdown-item logout-btn" @click="logout">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Đăng xuất</span>
+              </button>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
   </nav>
 </template>
 
@@ -127,6 +156,7 @@ export default {
   data() {
     return {
       user: JSON.parse(localStorage.getItem("user")) || null,
+      isNavOpen: false,
     };
   },
   methods: {

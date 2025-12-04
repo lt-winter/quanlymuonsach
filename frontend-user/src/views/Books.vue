@@ -2,183 +2,215 @@
   <div class="books-page">
     <h2 class="mb-4"><i class="fas fa-book"></i> Thư viện</h2>
 
-    <!-- Search and Filter -->
-    <div class="row mb-2">
-      <div class="col-md-6 mb-2">
-        <div class="input-group">
-          <input
-            type="text"
-            class="form-control"
-            placeholder="Tìm kiếm sách..."
-            v-model="searchText"
-          />
-        </div>
+    <div class="row">
+      <!-- Mobile Filter Toggle -->
+      <div class="col-12 d-lg-none mb-3">
+        <button
+          class="btn btn-primary w-100 d-flex align-items-center justify-content-center gap-2"
+          @click="showMobileFilter = true"
+        >
+          <i class="fas fa-filter"></i>
+          Lọc theo thể loại
+        </button>
       </div>
-      <div class="col-md-3 mb-2">
-        <CustomSelect
-          v-model="sortBy"
-          :options="sortOptions"
-          placeholder="Sắp xếp theo"
-          @update:modelValue="fetchBooks"
-        />
-      </div>
-      <div class="col-md-3 mb-2">
-        <CustomSelect
-          v-model="order"
-          :options="orderOptions"
-          placeholder="Thứ tự"
-          @update:modelValue="fetchBooks"
-        />
-      </div>
-    </div>
 
-    <!-- Genre Filter -->
-    <div class="row mb-2" v-if="availableGenres.length > 0">
-      <div class="col-12">
-        <div class="genre-filter">
-          <label class="filter-label">
-            <i class="fas fa-filter"></i> Lọc theo thể loại:
-          </label>
-
-          <div class="genre-tags">
+      <!-- Sidebar Filter -->
+      <div
+        class="col-lg-3 col-xl-2 mb-4 filter-column"
+        :class="{ 'show-mobile': showMobileFilter }"
+      >
+        <div
+          class="filter-overlay d-lg-none"
+          v-if="showMobileFilter"
+          @click="showMobileFilter = false"
+        ></div>
+        <div class="filter-sidebar" v-if="availableGenres.length > 0">
+          <div class="filter-header">
+            <div class="d-flex align-items-center gap-2">
+              <i class="fas fa-filter"></i>
+              <span>Thể loại</span>
+            </div>
             <button
-              class="genre-tag"
-              :class="{ active: selectedGenres.length === 0 }"
+              class="btn-close d-lg-none"
+              @click="showMobileFilter = false"
+            ></button>
+          </div>
+
+          <div class="genre-list">
+            <button
+              class="genre-item"
+              :class="{ active: selectedGenre === null }"
               @click="selectGenre(null)"
             >
-              <i class="fas fa-th"></i> Tất cả
+              <span class="genre-name">Tất cả</span>
+              <i class="fas fa-check" v-if="selectedGenre === null"></i>
             </button>
+
             <button
               v-for="genre in availableGenres"
               :key="genre"
-              class="genre-tag"
-              :class="{ active: selectedGenres.includes(genre) }"
+              class="genre-item"
+              :class="{ active: selectedGenre === genre }"
               @click="selectGenre(genre)"
             >
-              {{ genre }}
-              <i
-                v-if="selectedGenres.includes(genre)"
-                class="fas fa-times"
-                @click.stop="removeGenre(genre)"
-              ></i>
+              <span class="genre-name">{{ genre }}</span>
+              <i class="fas fa-check" v-if="selectedGenre === genre"></i>
             </button>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Loading -->
-    <div v-if="loading" class="loading-overlay">
-      <div class="spinner-border text-primary" role="status">
-        <span class="sr-only">Đang tải...</span>
-      </div>
-    </div>
-
-    <!-- Books Grid -->
-    <div>
-      <div v-if="books.length === 0" class="text-center py-4">
-        <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
-        <p class="text-muted">Không tìm thấy sách nào</p>
-      </div>
-
-      <div class="row row-cols-1 row-cols-md-3 row-cols-lg-5">
-        <div v-for="book in books" :key="book.maSach" class="col mb-4 p-2">
-          <router-link
-            :to="{ name: 'book.detail', params: { id: book.maSach } }"
-            custom
-            v-slot="{ navigate }"
-          >
-            <div class="book-card" @click="navigate">
-              <div class="book-image-wrapper">
-                <img
-                  :src="book.anhSach || '/placeholder-book.svg'"
-                  class="book-image"
-                  :alt="book.tenSach"
+      <!-- Main Content -->
+      <div class="col-lg-9 col-xl-10">
+        <!-- Search and Sort -->
+        <div class="toolbar mb-4">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <div class="search-box">
+                <input
+                  type="text"
+                  class="form-control search-input"
+                  placeholder="Tìm kiếm sách..."
+                  v-model="searchText"
                 />
-                <div class="book-overlay">
-                  <span class="view-btn">
-                    <i class="fas fa-eye"></i> Xem chi tiết
-                  </span>
-                </div>
-                <span v-if="book.soQuyen <= 0" class="out-of-stock-badge">
-                  Hết sách
-                </span>
-                <span v-else class="quantity-badge">
-                  {{ book.soQuyen }}
-                </span>
-              </div>
-
-              <div class="book-info p-3">
-                <h5 class="book-title">{{ book.tenSach }}</h5>
-                <p class="book-author">
-                  <i class="fas fa-pen-fancy"></i>
-                  {{ book.tacGia || "Đang cập nhật" }}
-                </p>
-
-                <!-- Thể loại -->
-                <div
-                  class="book-genres"
-                  v-if="book.theLoai && book.theLoai.length > 0"
-                >
-                  <span
-                    v-for="genre in book.theLoai"
-                    :key="genre"
-                    class="genre-badge"
-                  >
-                    {{ genre }}
-                  </span>
-                </div>
+                <i class="fas fa-search search-icon"></i>
               </div>
             </div>
-          </router-link>
+            <div class="col-md-3">
+              <CustomSelect
+                v-model="sortBy"
+                :options="sortOptions"
+                placeholder="Sắp xếp theo"
+                @update:modelValue="fetchBooks"
+              />
+            </div>
+            <div class="col-md-3">
+              <CustomSelect
+                v-model="order"
+                :options="orderOptions"
+                placeholder="Thứ tự"
+                @update:modelValue="fetchBooks"
+              />
+            </div>
+          </div>
         </div>
-      </div>
 
-      <!-- Pagination -->
-      <div v-if="totalPages > 1" class="pagination-wrapper mt-4">
-        <nav aria-label="Page navigation">
-          <ul class="pagination justify-content-center">
-            <li class="page-item" :class="{ disabled: currentPage === 1 }">
-              <button
-                class="page-link"
-                @click="changePage(currentPage - 1)"
-                :disabled="currentPage === 1"
+        <!-- Loading -->
+        <!-- <div v-if="loading" class="loading-overlay">
+          <div class="spinner-border text-primary" role="status">
+            <span class="sr-only">Đang tải...</span>
+          </div>
+        </div> -->
+
+        <!-- Books Grid -->
+        <div>
+          <div v-if="books.length === 0" class="text-center py-4">
+            <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
+            <p class="text-muted">Không tìm thấy sách nào</p>
+          </div>
+
+          <div
+            class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-4 row-cols-xl-5 row-cols-xxl-6 g-3"
+          >
+            <div v-for="book in books" :key="book.maSach" class="col mb-4">
+              <router-link
+                :to="{ name: 'book.detail', params: { id: book.maSach } }"
+                custom
+                v-slot="{ navigate }"
               >
-                <i class="fas fa-chevron-left"></i>
-              </button>
-            </li>
+                <div class="book-card" @click="navigate">
+                  <div class="book-image-wrapper">
+                    <img
+                      :src="book.anhSach || '/placeholder-book.svg'"
+                      class="book-image"
+                      :alt="book.tenSach"
+                    />
+                    <div class="book-overlay">
+                      <span class="view-btn">
+                        <i class="fas fa-eye"></i> Xem chi tiết
+                      </span>
+                    </div>
+                    <span v-if="book.soQuyen <= 0" class="out-of-stock-badge">
+                      Hết sách
+                    </span>
+                    <span v-else class="quantity-badge">
+                      {{ book.soQuyen }}
+                    </span>
+                  </div>
 
-            <li
-              v-for="page in visiblePages"
-              :key="page"
-              class="page-item"
-              :class="{ active: currentPage === page }"
-            >
-              <button class="page-link" @click="changePage(page)">
-                {{ page }}
-              </button>
-            </li>
+                  <div class="book-info p-3">
+                    <h5 class="book-title">{{ book.tenSach }}</h5>
+                    <p class="book-author">
+                      <i class="fas fa-pen-fancy"></i>
+                      {{ book.tacGia || "Đang cập nhật" }}
+                    </p>
 
-            <li
-              class="page-item"
-              :class="{ disabled: currentPage === totalPages }"
-            >
-              <button
-                class="page-link"
-                @click="changePage(currentPage + 1)"
-                :disabled="currentPage === totalPages"
-              >
-                <i class="fas fa-chevron-right"></i>
-              </button>
-            </li>
-          </ul>
-        </nav>
+                    <!-- Thể loại -->
+                    <div
+                      class="book-genres"
+                      v-if="book.theLoai && book.theLoai.length > 0"
+                    >
+                      <span
+                        v-for="genre in book.theLoai"
+                        :key="genre"
+                        class="genre-badge"
+                      >
+                        {{ genre }}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </router-link>
+            </div>
+          </div>
 
-        <div class="pagination-info text-center mt-2">
-          <small class="text-muted">
-            Trang {{ currentPage }} / {{ totalPages }} - Tổng số:
-            {{ totalBooks }} sách
-          </small>
+          <!-- Pagination -->
+          <div v-if="totalPages > 1" class="pagination-wrapper mt-4">
+            <nav aria-label="Page navigation">
+              <ul class="pagination justify-content-center">
+                <li class="page-item" :class="{ disabled: currentPage === 1 }">
+                  <button
+                    class="page-link"
+                    @click="changePage(currentPage - 1)"
+                    :disabled="currentPage === 1"
+                  >
+                    <i class="fas fa-chevron-left"></i>
+                  </button>
+                </li>
+
+                <li
+                  v-for="page in visiblePages"
+                  :key="page"
+                  class="page-item"
+                  :class="{ active: currentPage === page }"
+                >
+                  <button class="page-link" @click="changePage(page)">
+                    {{ page }}
+                  </button>
+                </li>
+
+                <li
+                  class="page-item"
+                  :class="{ disabled: currentPage === totalPages }"
+                >
+                  <button
+                    class="page-link"
+                    @click="changePage(currentPage + 1)"
+                    :disabled="currentPage === totalPages"
+                  >
+                    <i class="fas fa-chevron-right"></i>
+                  </button>
+                </li>
+              </ul>
+            </nav>
+
+            <div class="pagination-info text-center mt-2">
+              <small class="text-muted">
+                Trang {{ currentPage }} / {{ totalPages }} - Tổng số:
+                {{ totalBooks }} sách
+              </small>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -200,7 +232,7 @@ export default {
       sortBy: "",
       order: "asc",
       loading: false,
-      selectedGenres: [],
+      selectedGenre: null,
       currentPage: 1,
       totalBooks: 0,
       totalPages: 0,
@@ -215,6 +247,7 @@ export default {
         { value: "desc", label: "Giảm dần" },
       ],
       allGenres: [], // Lưu tất cả genres từ backend
+      showMobileFilter: false,
     };
   },
   computed: {
@@ -249,8 +282,8 @@ export default {
         };
 
         // Thêm filter thể loại
-        if (this.selectedGenres.length > 0) {
-          params.theLoai = this.selectedGenres;
+        if (this.selectedGenre) {
+          params.theLoai = [this.selectedGenre];
         }
 
         // Thêm tìm kiếm
@@ -281,25 +314,9 @@ export default {
     },
     selectGenre(genre) {
       console.log("selectGenre called with:", genre);
-      if (genre === null) {
-        // Click "Tất cả" - bỏ chọn tất cả
-        this.selectedGenres = [];
-      } else {
-        // Toggle thể loại
-        const index = this.selectedGenres.indexOf(genre);
-        if (index > -1) {
-          this.selectedGenres.splice(index, 1);
-        } else {
-          this.selectedGenres.push(genre);
-        }
-      }
-      console.log("selectedGenres after update:", this.selectedGenres);
-    },
-    removeGenre(genre) {
-      const index = this.selectedGenres.indexOf(genre);
-      if (index > -1) {
-        this.selectedGenres.splice(index, 1);
-      }
+      this.selectedGenre = genre;
+      this.showMobileFilter = false;
+      console.log("selectedGenre after update:", this.selectedGenre);
     },
     changePage(page) {
       if (page >= 1 && page <= this.totalPages) {
@@ -330,13 +347,10 @@ export default {
       this.currentPage = 1;
       this.fetchBooks();
     },
-    selectedGenres: {
-      handler() {
-        console.log("watch selectedGenres triggered");
-        this.currentPage = 1;
-        this.fetchBooks();
-      },
-      deep: true,
+    selectedGenre() {
+      console.log("watch selectedGenre triggered");
+      this.currentPage = 1;
+      this.fetchBooks();
     },
   },
   mounted() {
@@ -347,69 +361,157 @@ export default {
 </script>
 
 <style scoped>
-.genre-filter {
+.filter-sidebar {
   background: white;
+  border-radius: 16px;
   padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.filter-label {
-  font-weight: 600;
-  color: #1f2937;
-  margin-bottom: 12px;
-  display: block;
-  font-size: 0.95rem;
-}
-
-.filter-label i {
-  color: #4361ee;
-  margin-right: 6px;
-}
-
-.genre-tags {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 20px;
+  max-height: calc(100vh - 40px);
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  flex-direction: column;
 }
 
-.genre-tag {
-  padding: 8px 16px;
-  border: 2px solid #e5e7eb;
-  background: white;
-  color: #6b7280;
-  border-radius: 20px;
-  font-size: 0.875rem;
+.filter-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-weight: 700;
+  color: #1f2937;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+
+.filter-header i {
+  color: #4361ee;
+}
+
+.genre-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  padding-right: 5px;
+  flex: 1;
+}
+
+/* Custom Scrollbar for genre list */
+.genre-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.genre-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.genre-list::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 10px;
+}
+
+.genre-list::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+.genre-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 15px;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 10px;
+  color: #4b5563;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
+  text-align: left;
+  width: 100%;
+  flex-shrink: 0;
 }
 
-.genre-tag:hover {
-  border-color: #4361ee;
+/* Mobile Filter Styles */
+@media (max-width: 991.98px) {
+  .filter-column {
+    position: fixed;
+    top: 0;
+    left: -300px;
+    width: 280px;
+    height: 100vh;
+    z-index: 1050;
+    transition: left 0.3s ease;
+    padding: 0;
+    margin: 0 !important;
+  }
+
+  .filter-column.show-mobile {
+    left: 0;
+  }
+
+  .filter-sidebar {
+    height: 100%;
+    border-radius: 0;
+    max-height: 100vh;
+    top: 0;
+    z-index: 1060;
+    position: relative;
+  }
+
+  .filter-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1040;
+    backdrop-filter: blur(2px);
+  }
+}
+
+.genre-item:hover {
+  background: #f3f4f6;
   color: #4361ee;
-  transform: translateY(-2px);
 }
 
-.genre-tag.active {
-  background: linear-gradient(135deg, #4361ee, #7209b7);
-  border-color: #4361ee;
+.genre-item.active {
+  background: linear-gradient(135deg, #4361ee, #3f51b5);
   color: white;
-  box-shadow: 0 4px 8px rgba(67, 97, 238, 0.3);
+  box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
 }
 
-.genre-tag i {
-  margin-left: 4px;
-  font-size: 0.75rem;
-  opacity: 0;
-  transition: opacity 0.2s;
+.genre-item i {
+  font-size: 0.8rem;
 }
 
-.genre-tag.active i {
-  opacity: 1;
+.search-box {
+  position: relative;
+}
+
+.search-input {
+  padding-right: 40px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  height: 42px;
+}
+
+.search-input:focus {
+  border-color: #4361ee;
+  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+}
+
+.search-icon {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
 }
 
 .book-genres {

@@ -134,11 +134,8 @@
                     <i class="fas fa-eye"></i> Xem chi tiết
                   </span>
                 </div>
-                <span v-if="book.soQuyen <= 0" class="out-of-stock-badge">
-                  Hết sách
-                </span>
-                <span v-else class="quantity-badge">
-                  SL: {{ book.soQuyen }}
+                <span class="quantity-badge">
+                  {{ book.soQuyen }}
                 </span>
               </div>
 
