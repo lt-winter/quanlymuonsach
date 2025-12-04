@@ -209,13 +209,22 @@ export default {
       this.success = "";
 
       try {
-        await ReaderService.register(values);
-        this.success = "Đăng ký thành công! Vui lòng đăng nhập.";
-        setTimeout(() => {
-          this.$router.push("/login");
-        }, 2000);
+        const response = await ReaderService.register(values);
+        
+        // Lưu token và user vào localStorage
+        if (response.token && response.user) {
+          localStorage.setItem("token", response.token);
+          localStorage.setItem("user", JSON.stringify(response.user));
+          
+          // Hiển thị thông báo thành công với mã độc giả
+          this.success = `Đăng ký thành công! Mã độc giả của bạn là: ${response.user.maDocGia}. Vui lòng lưu lại để đăng nhập lần sau.`;
+          
+          // Chuyển về trang chủ sau 3 giây
+          setTimeout(() => {
+            this.$router.push("/");
+          }, 3000);
+        }
       } catch (err) {
-        console.error("Register error:", err);
         const serverMessage = err?.response?.data?.message || err?.message;
         this.error = serverMessage || "Đã xảy ra lỗi khi đăng ký";
       } finally {

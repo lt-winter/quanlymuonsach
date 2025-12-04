@@ -20,49 +20,6 @@
         <div class="floating-book book-3">📕</div>
       </div>
     </div>
-
-    <!-- Stats Section -->
-    <div class="stats-section">
-      <div class="row text-center">
-        <div class="col-md-3 col-6 mb-3">
-          <div class="stat-card">
-            <div class="stat-icon">
-              <i class="fas fa-book"></i>
-            </div>
-            <h3 class="stat-number" data-target="1000">0</h3>
-            <p class="stat-label">Đầu sách</p>
-          </div>
-        </div>
-        <div class="col-md-3 col-6 mb-3">
-          <div class="stat-card">
-            <div class="stat-icon">
-              <i class="fas fa-users"></i>
-            </div>
-            <h3 class="stat-number" data-target="500">0</h3>
-            <p class="stat-label">Độc giả</p>
-          </div>
-        </div>
-        <div class="col-md-3 col-6 mb-3">
-          <div class="stat-card">
-            <div class="stat-icon">
-              <i class="fas fa-book-reader"></i>
-            </div>
-            <h3 class="stat-number" data-target="2000">0</h3>
-            <p class="stat-label">Lượt mượn</p>
-          </div>
-        </div>
-        <div class="col-md-3 col-6 mb-3">
-          <div class="stat-card">
-            <div class="stat-icon">
-              <i class="fas fa-star"></i>
-            </div>
-            <h3 class="stat-number" data-target="98">0</h3>
-            <p class="stat-label">Đánh giá 5⭐</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Features Section -->
     <div class="features-section">
       <h2 class="section-title text-center mb-5">
