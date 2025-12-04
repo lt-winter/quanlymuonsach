@@ -106,6 +106,11 @@ class ReaderService {
     const reader = await this.DocGia.findOne({ maDocGia });
     if (!reader) return null;
 
+    // Kiểm tra xem reader có mật khẩu không
+    if (!reader.matKhau) {
+      return null; // Tài khoản chưa có mật khẩu
+    }
+
     const isMatch = await bcrypt.compare(matKhau, reader.matKhau);
     if (!isMatch) return null;
 
