@@ -48,15 +48,14 @@
         </div>
         <div class="col-md-6 mb-3">
           <label class="form-label">Phái</label>
-          <Field name="phai" v-model="formData.phai">
-            <template v-slot="{ field, errorMessage }">
-              <CustomSelect
-                v-bind="field"
-                :options="phaiOptions"
-                placeholder="Chọn phái"
-                :class="{ 'is-invalid': errorMessage }"
-              />
-            </template>
+          <Field name="phai" v-slot="{ field, errorMessage }">
+            <CustomSelect
+              v-bind="field"
+              v-model="field.value"
+              :options="phaiOptions"
+              placeholder="Chọn phái"
+              :class="{ 'is-invalid': errorMessage }"
+            />
           </Field>
           <ErrorMessage name="phai" class="error-feedback" />
         </div>
@@ -172,9 +171,6 @@ export default {
       loading: false,
       error: "",
       success: "",
-      formData: {
-        phai: "",
-      },
       phaiOptions: [
         { value: "Nam", label: "Nam" },
         { value: "Nữ", label: "Nữ" },
@@ -209,7 +205,15 @@ export default {
       this.success = "";
 
       try {
-        const response = await ReaderService.register(values);
+        // Chuyển đổi password -> matKhau cho backend
+        const payload = {
+          ...values,
+          matKhau: values.password,
+        };
+        delete payload.password;
+        delete payload.confirmPassword;
+
+        const response = await ReaderService.register(payload);
         
         // Lưu token và user vào localStorage
         if (response.token && response.user) {
