@@ -39,23 +39,71 @@
             </a>
           </router-link>
         </li>
-        <li class="nav-item">
-          <router-link :to="{ name: 'books' }" custom v-slot="{ navigate }">
-            <a
-              @click="
-                navigate();
-                isNavOpen = false;
-              "
-              class="nav-link nav-link-custom"
-              :class="{
-                'active-link':
-                  $route.name === 'books' || $route.name === 'book.detail',
-              }"
+        <li class="nav-item dropdown">
+          <a
+            class="nav-link nav-link-custom dropdown-toggle"
+            href="#"
+            role="button"
+            data-toggle="dropdown"
+            aria-expanded="false"
+            :class="{
+              'active-link':
+                $route.name === 'books' ||
+                $route.name === 'book.detail' ||
+                $route.name === 'books.by-publisher' ||
+                $route.name === 'books.by-author',
+            }"
+          >
+            <i class="fas fa-book"></i>
+            <span>Sách</span>
+          </a>
+          <div class="dropdown-menu">
+            <router-link
+              :to="{ name: 'books' }"
+              custom
+              v-slot="{ navigate }"
             >
-              <i class="fas fa-book"></i>
-              <span>Sách</span>
-            </a>
-          </router-link>
+              <a
+                @click="
+                  navigate();
+                  isNavOpen = false;
+                "
+                class="dropdown-item"
+              >
+                <i class="fas fa-list"></i> Tất cả sách
+              </a>
+            </router-link>
+            <router-link
+              :to="{ name: 'books.by-publisher' }"
+              custom
+              v-slot="{ navigate }"
+            >
+              <a
+                @click="
+                  navigate();
+                  isNavOpen = false;
+                "
+                class="dropdown-item"
+              >
+                <i class="fas fa-building"></i> Theo nhà xuất bản
+              </a>
+            </router-link>
+            <router-link
+              :to="{ name: 'books.by-author' }"
+              custom
+              v-slot="{ navigate }"
+            >
+              <a
+                @click="
+                  navigate();
+                  isNavOpen = false;
+                "
+                class="dropdown-item"
+              >
+                <i class="fas fa-user-edit"></i> Theo tác giả
+              </a>
+            </router-link>
+          </div>
         </li>
       </ul>
 

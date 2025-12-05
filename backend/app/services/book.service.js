@@ -35,7 +35,30 @@ class BookService {
       .sort(sort)
       .skip(skip)
       .limit(limit);
-    return await cursor.toArray();
+    const books = await cursor.toArray();
+    
+    // Populate publisher data cho tất cả sách
+    const { ObjectId } = require("mongodb");
+    for (let book of books) {
+      if (book.maNXB) {
+        let publisher = null;
+        
+        // Nếu maNXB là ObjectId hợp lệ, tìm theo _id
+        if (ObjectId.isValid(book.maNXB)) {
+          publisher = await this.NhaXuatBan.findOne({ _id: new ObjectId(book.maNXB) });
+        }
+        // Nếu không tìm thấy, thử tìm theo maNXB string
+        if (!publisher) {
+          publisher = await this.NhaXuatBan.findOne({ maNXB: book.maNXB });
+        }
+        
+        if (publisher) {
+          book.publisher = publisher;
+        }
+      }
+    }
+    
+    return books;
   }
 
   async findById(id) {
@@ -77,6 +100,20 @@ class BookService {
     // Lấy tất cả genres duy nhất từ collection sách
     const genres = await this.Sach.distinct("theLoai", { theLoai: { $exists: true, $ne: [] } });
     return genres.sort();
+  }
+
+  async getDistinctAuthors() {
+    // Lấy tất cả tác giả duy nhất từ collection sách
+    const authors = await this.Sach.distinct("tacGia", { 
+      tacGia: { $exists: true, $ne: null, $ne: "" } 
+    });
+    return authors.sort();
+  }
+
+  async getDistinctPublishers() {
+    // Lấy tất cả nhà xuất bản duy nhất
+    const publishers = await this.NhaXuatBan.find({}).sort({ tenNXB: 1 }).toArray();
+    return publishers;
   }
 }
 

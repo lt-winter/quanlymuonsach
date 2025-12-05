@@ -3,7 +3,7 @@ const MongoDB = require("@/utils/mongodb.util");
 const ApiError = require("@/api-error");
 
 exports.findAll = async (req, res, next) => {
-  const { sortBy, order, theLoai, page, limit, name } = req.query;
+  const { sortBy, order, theLoai, page, limit, name, tacGia, maNXB } = req.query;
   
   // Debug logs removed
   
@@ -19,6 +19,16 @@ exports.findAll = async (req, res, next) => {
       if (genres.length > 0) {
         filter.theLoai = { $all: genres }; // Phải có tất cả thể loại
       }
+    }
+    
+    // Filter theo tác giả nếu có
+    if (tacGia) {
+      filter.tacGia = tacGia;
+    }
+    
+    // Filter theo nhà xuất bản nếu có
+    if (maNXB) {
+      filter.maNXB = maNXB;
     }
     
     // Filter theo tên nếu có
@@ -137,6 +147,40 @@ exports.getGenres = async (req, res, next) => {
   } catch (error) {
     return next(
       new ApiError(500, `Đã xảy ra lỗi khi truy xuất thể loại: ${error.message}`),
+    );
+  }
+};
+
+exports.getAuthors = async (req, res, next) => {
+  try {
+    const bookService = new BookService(MongoDB.client);
+    
+    // Lấy tất cả tác giả duy nhất từ tất cả sách
+    const authors = await bookService.getDistinctAuthors();
+    
+    return res.send({
+      data: authors
+    });
+  } catch (error) {
+    return next(
+      new ApiError(500, `Đã xảy ra lỗi khi truy xuất tác giả: ${error.message}`),
+    );
+  }
+};
+
+exports.getPublishers = async (req, res, next) => {
+  try {
+    const bookService = new BookService(MongoDB.client);
+    
+    // Lấy tất cả nhà xuất bản
+    const publishers = await bookService.getDistinctPublishers();
+    
+    return res.send({
+      data: publishers
+    });
+  } catch (error) {
+    return next(
+      new ApiError(500, `Đã xảy ra lỗi khi truy xuất nhà xuất bản: ${error.message}`),
     );
   }
 };

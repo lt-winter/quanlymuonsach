@@ -16,6 +16,12 @@ class BookService {
   async getGenres() {
     return (await this.api.get("/genres")).data;
   }
+  async getAuthors() {
+    return (await this.api.get("/authors")).data;
+  }
+  async getPublishers() {
+    return (await this.api.get("/publishers")).data;
+  }
   async get(id) {
     return (await this.api.get(`/${id}`)).data;
   }
