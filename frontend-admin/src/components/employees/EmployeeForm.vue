@@ -136,74 +136,67 @@ export default {
     isEdit: Boolean,
   },
   data() {
-    const employeeFormSchema = yup.object().shape({
-      hoTenNv: yup
-        .string()
-        .required("Họ và tên lót phải có giá trị.")
-        .min(2, "Họ và tên lót phải ít nhất 2 ký tự.")
-        .max(50, "Họ và tên lót có nhiều nhất 50 ký tự."),
-      tenNguoiDung: yup
-        .string()
-        .required("Tên phải có giá trị.")
-        .min(2, "Tên phải ít nhất 2 ký tự.")
-        .max(50, "Tên có nhiều nhất 50 ký tự."),
-      matKhau: this.isEdit
-        ? yup.string().notRequired()
-        : yup
-            .string()
-            .required("Mật khẩu phải có giá trị.")
-            .min(6, "Mật khẩu phải ít nhất 6 ký tự.")
-            .max(100, "Mật khẩu có nhiều nhất 100 ký tự.")
-            .matches(
-              /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/,
-              "Mật khẩu phải chứa ít nhất một chữ hoa, một chữ thường, một số và một ký tự đặc biệt."
-            ),
-      chucVu: yup
-        .string()
-        .required("Chức vụ phải có giá trị.")
-        .max(50, "Chức vụ có nhiều nhất 50 ký tự."),
-      diaChi: yup
-        .string()
-        .required("Địa chỉ phải có giá trị")
-        .max(100, "Địa chỉ tối đa 100 ký tự."),
-      soDienThoai: yup
-        .string()
-        .required("Số điện thoại phải có giá trị.")
-        .matches(
-          /((09|03|07|08|05)+([0-9]{8})\b)/g,
-          "Số điện thoại không hợp lệ."
-        ),
-      password: yup.string().when("$changePassword", {
-        is: true,
-        then: (schema) =>
-          schema
-            .required("Vui lòng nhập mật khẩu mới.")
-            .min(6, "Mật khẩu phải ít nhất 6 ký tự.")
-            .matches(
-              /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/,
-              "Mật khẩu phải chứa chữ hoa, chữ thường, số và ký tự đặc biệt."
-            ),
-        otherwise: (schema) => schema.notRequired(),
-      }),
-
-      confirmPassword: yup.string().when("password", {
-        is: (val) => val && val.length > 0,
-        then: (schema) =>
-          schema
-            .required("Vui lòng xác nhận mật khẩu.")
-            .oneOf([yup.ref("password")], "Mật khẩu xác nhận không khớp."),
-        otherwise: (schema) => schema.notRequired(),
-      }),
-    });
     return {
       employeeLocal: { ...this.employee, vaiTro: "admin" },
       changePassword: false,
       password: "",
       confirmPassword: "",
-      employeeFormSchema,
     };
   },
   computed: {
+    employeeFormSchema() {
+      return yup.object().shape({
+        hoTenNv: yup
+          .string()
+          .required("Họ và tên lót phải có giá trị.")
+          .min(2, "Họ và tên lót phải ít nhất 2 ký tự.")
+          .max(50, "Họ và tên lót có nhiều nhất 50 ký tự."),
+        tenNguoiDung: yup
+          .string()
+          .required("Tên phải có giá trị.")
+          .min(2, "Tên phải ít nhất 2 ký tự.")
+          .max(50, "Tên có nhiều nhất 50 ký tự."),
+        matKhau: this.isEdit
+          ? yup.string().notRequired()
+          : yup
+              .string()
+              .required("Mật khẩu phải có giá trị.")
+              .min(6, "Mật khẩu phải ít nhất 6 ký tự.")
+              .max(100, "Mật khẩu có nhiều nhất 100 ký tự."),
+        chucVu: yup
+          .string()
+          .required("Chức vụ phải có giá trị.")
+          .max(50, "Chức vụ có nhiều nhất 50 ký tự."),
+        diaChi: yup
+          .string()
+          .required("Địa chỉ phải có giá trị")
+          .max(100, "Địa chỉ tối đa 100 ký tự."),
+        soDienThoai: yup
+          .string()
+          .required("Số điện thoại phải có giá trị.")
+          .matches(
+            /((09|03|07|08|05)+([0-9]{8})\b)/g,
+            "Số điện thoại không hợp lệ."
+          ),
+        password: yup.string().when("$changePassword", {
+          is: true,
+          then: (schema) =>
+            schema
+              .required("Vui lòng nhập mật khẩu mới.")
+              .min(6, "Mật khẩu phải ít nhất 6 ký tự."),
+          otherwise: (schema) => schema.notRequired(),
+        }),
+
+        confirmPassword: yup.string().when("password", {
+          is: (val) => val && val.length > 0,
+          then: (schema) =>
+            schema
+              .required("Vui lòng xác nhận mật khẩu.")
+              .oneOf([yup.ref("password")], "Mật khẩu xác nhận không khớp."),
+          otherwise: (schema) => schema.notRequired(),
+        }),
+      });
+    },
     passwordMismatch() {
       return (
         this.changePassword &&
@@ -218,9 +211,17 @@ export default {
 
       const payload = { ...this.employeeLocal };
 
-      if (this.isEdit && this.changePassword) payload.matKhau = this.password;
-
-      if (!this.changePassword) delete payload.matKhau;
+      // Khi edit và đổi mật khẩu, dùng password mới
+      if (this.isEdit && this.changePassword) {
+        payload.matKhau = this.password;
+      }
+      
+      // Khi edit nhưng không đổi mật khẩu, xóa field matKhau
+      if (this.isEdit && !this.changePassword) {
+        delete payload.matKhau;
+      }
+      
+      // Khi tạo mới, giữ nguyên matKhau từ employeeLocal
 
       this.$emit("submit:employee", payload);
     },
