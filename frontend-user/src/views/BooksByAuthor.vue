@@ -6,7 +6,7 @@
 
     <div class="row">
       <!-- Sidebar Author List -->
-      <div class="col-lg-3 col-xl-2 mb-4">
+      <div class="col-lg-4 col-xl-3 mb-4">
         <div
           class="filter-overlay d-lg-none"
           v-if="showMobileFilter"
@@ -65,7 +65,7 @@
       </div>
 
       <!-- Main Content -->
-      <div class="col-lg-9 col-xl-10">
+      <div class="col-lg-8 col-xl-9">
         <!-- Mobile filter toggle -->
         <div class="d-lg-none mb-3">
           <button
@@ -408,16 +408,18 @@ export default {
 }
 
 .filter-header {
-  padding: 20px;
+  padding: 24px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
   font-weight: 600;
+  font-size: 1.05rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .author-search {
+  padding: 16px 20px;
   border-bottom: 1px solid #f0f0f0;
 }
 
@@ -428,7 +430,7 @@ export default {
 
 .author-item {
   width: 100%;
-  padding: 15px 20px;
+  padding: 18px 24px;
   border: none;
   background: white;
   text-align: left;
@@ -438,6 +440,7 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  font-size: 0.95rem;
 }
 
 .author-item:hover {

@@ -62,7 +62,8 @@ export default {
         this.goBack();
       } catch (error) {
         console.error("Lỗi khi cập nhật:", error);
-        alert("Có lỗi xảy ra khi cập nhật");
+        const errorMsg = error.response?.data?.message || "Có lỗi xảy ra khi cập nhật";
+        alert(errorMsg);
       }
     },
     async deleteBorrow() {
@@ -85,7 +86,8 @@ export default {
           alert("Đã trả sách thành công!");
         } catch (error) {
           console.error("Lỗi khi trả sách:", error);
-          alert("Có lỗi xảy ra khi trả sách");
+          const errorMsg = error.response?.data?.message || "Có lỗi xảy ra khi trả sách";
+          alert(errorMsg);
         }
       }
     },
@@ -98,7 +100,8 @@ export default {
           alert("Đã báo mất sách!");
         } catch (error) {
           console.error("Lỗi khi báo mất:", error);
-          alert("Có lỗi xảy ra khi báo mất sách");
+          const errorMsg = error.response?.data?.message || "Có lỗi xảy ra khi báo mất sách";
+          alert(errorMsg);
         }
       }
     },

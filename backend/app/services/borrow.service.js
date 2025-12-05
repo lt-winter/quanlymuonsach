@@ -66,11 +66,32 @@ class BorrowService {
 
   // Trả sách
   async returnBook(borrowId, ngayTra) {
-    return await this.Borrow.findOneAndUpdate(
-      { _id: borrowId },
-      { $set: { ngayTra: new Date(ngayTra), ngayCapNhat: new Date() } },
+    const { ObjectId } = require("mongodb");
+    
+    // Update borrow record with return status
+    const updated = await this.Borrow.findOneAndUpdate(
+      { _id: new ObjectId(borrowId) },
+      { 
+        $set: { 
+          ngayTra: new Date(ngayTra), 
+          trangThai: "daTraSach",
+          ngayCapNhat: new Date() 
+        } 
+      },
       { returnDocument: "after" },
     );
+    
+    if (!updated) return null;
+    
+    // Populate thông tin sách
+    if (updated.maSach) {
+      const book = await this.Sach.findOne({ maSach: updated.maSach });
+      if (book) {
+        updated.sach = book;
+      }
+    }
+    
+    return updated;
   }
 
   // Tìm các bản ghi mượn theo độc giả (dùng ObjectId)

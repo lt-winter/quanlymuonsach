@@ -73,6 +73,23 @@ exports.findOne = async (req, res, next) => {
 exports.update = async (req, res, next) => {
   try {
     const borrowService = new BorrowService(MongoDB.client);
+    
+    // Kiểm tra xem phiếu mượn có quá hạn không
+    const existingBorrow = await borrowService.findById(req.params.id);
+    if (!existingBorrow) {
+      return next(new ApiError(404, "Không tìm thấy phiếu mượn"));
+    }
+    
+    // Nếu đang mượn và quá hạn > 14 ngày -> chỉ cho phép xóa
+    if (existingBorrow.trangThai === "dangMuon" && existingBorrow.hanTra) {
+      const hanTra = new Date(existingBorrow.hanTra);
+      const today = new Date();
+      const daysOverdue = Math.ceil((today - hanTra) / (1000 * 60 * 60 * 24));
+      if (daysOverdue > 14) {
+        return next(new ApiError(403, "Sách quá hạn quá 14 ngày. Chỉ có thể xóa phiếu mượn này."));
+      }
+    }
+    
     const document = await borrowService.update(req.params.id, req.body);
     if (!document) {
       return next(new ApiError(404, "Không tìm thấy phiếu mượn"));
@@ -92,6 +109,23 @@ exports.returnBook = async (req, res, next) => {
   }
   try {
     const borrowService = new BorrowService(MongoDB.client);
+    
+    // Kiểm tra xem phiếu mượn có quá hạn không
+    const existingBorrow = await borrowService.findById(req.params.id);
+    if (!existingBorrow) {
+      return next(new ApiError(404, "Không tìm thấy phiếu mượn"));
+    }
+    
+    // Nếu đang mượn và quá hạn > 14 ngày -> chỉ cho phép xóa
+    if (existingBorrow.trangThai === "dangMuon" && existingBorrow.hanTra) {
+      const hanTra = new Date(existingBorrow.hanTra);
+      const today = new Date();
+      const daysOverdue = Math.ceil((today - hanTra) / (1000 * 60 * 60 * 24));
+      if (daysOverdue > 14) {
+        return next(new ApiError(403, "Sách quá hạn quá 14 ngày. Không thể trả sách, chỉ có thể xóa phiếu mượn."));
+      }
+    }
+    
     const document = await borrowService.returnBook(
       req.params.id,
       req.body.ngayTra,
@@ -123,6 +157,23 @@ exports.returnBook = async (req, res, next) => {
 exports.reportLost = async (req, res, next) => {
   try {
     const borrowService = new BorrowService(MongoDB.client);
+    
+    // Kiểm tra xem phiếu mượn có quá hạn không
+    const existingBorrow = await borrowService.findById(req.params.id);
+    if (!existingBorrow) {
+      return next(new ApiError(404, "Không tìm thấy phiếu mượn"));
+    }
+    
+    // Nếu đang mượn và quá hạn > 14 ngày -> chỉ cho phép xóa
+    if (existingBorrow.trangThai === "dangMuon" && existingBorrow.hanTra) {
+      const hanTra = new Date(existingBorrow.hanTra);
+      const today = new Date();
+      const daysOverdue = Math.ceil((today - hanTra) / (1000 * 60 * 60 * 24));
+      if (daysOverdue > 14) {
+        return next(new ApiError(403, "Sách quá hạn quá 14 ngày. Không thể báo mất, chỉ có thể xóa phiếu mượn."));
+      }
+    }
+    
     const document = await borrowService.reportLost(req.params.id);
     if (!document) {
       return next(new ApiError(404, "Không tìm thấy phiếu mượn"));

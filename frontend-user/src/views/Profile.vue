@@ -70,43 +70,52 @@
               <i class="fas fa-edit"></i> Chỉnh sửa thông tin cá nhân
             </h5>
 
-            <Form :validation-schema="profileSchema" @submit="handleUpdateProfile" class="form-grid">
+            <Form 
+              :validation-schema="profileSchema" 
+              :initial-values="profileForm"
+              @submit="handleUpdateProfile" 
+              class="form-grid"
+            >
               <div class="form-group">
                 <label>Họ và tên lót</label>
-                <Field name="hoLot" v-model="profileForm.hoLot" class="form-control" />
+                <Field name="hoLot" class="form-control" />
                 <ErrorMessage name="hoLot" class="error-feedback" />
               </div>
 
               <div class="form-group">
                 <label>Tên</label>
-                <Field name="ten" v-model="profileForm.ten" class="form-control" />
+                <Field name="ten" class="form-control" />
                 <ErrorMessage name="ten" class="error-feedback" />
               </div>
 
               <div class="form-group">
                 <label>Ngày sinh</label>
-                <Field name="ngaySinh" v-model="profileForm.ngaySinh" type="date" class="form-control" />
+                <Field name="ngaySinh" type="date" class="form-control" />
                 <ErrorMessage name="ngaySinh" class="error-feedback" />
               </div>
 
               <div class="form-group">
                 <label>Phái</label>
-                <CustomSelect
-                  v-model="profileForm.phai"
-                  :options="phaiOptions"
-                  placeholder="Chọn phái"
-                />
+                <Field name="phai" v-slot="{ field }">
+                  <CustomSelect
+                    v-bind="field"
+                    v-model="field.value"
+                    :options="phaiOptions"
+                    placeholder="Chọn phái"
+                  />
+                </Field>
+                <ErrorMessage name="phai" class="error-feedback" />
               </div>
 
               <div class="form-group form-group-full">
                 <label>Địa chỉ</label>
-                <Field name="diaChi" v-model="profileForm.diaChi" class="form-control" />
+                <Field name="diaChi" class="form-control" />
                 <ErrorMessage name="diaChi" class="error-feedback" />
               </div>
 
               <div class="form-group form-group-full">
                 <label>Số điện thoại</label>
-                <Field name="dienThoai" v-model="profileForm.dienThoai" class="form-control" />
+                <Field name="dienThoai" class="form-control" />
                 <ErrorMessage name="dienThoai" class="error-feedback" />
               </div>
 
@@ -267,7 +276,7 @@ export default {
           hoLot: values.hoLot,
           ten: values.ten,
           ngaySinh: values.ngaySinh,
-          phai: this.profileForm.phai,
+          phai: values.phai,
           diaChi: values.diaChi,
           dienThoai: values.dienThoai,
         };

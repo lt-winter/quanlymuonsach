@@ -205,7 +205,14 @@
       </button>
 
       <template v-if="isEdit && borrowLocal.trangThai === 'dangMuon'">
+        <!-- Hiển thị cảnh báo nếu sách quá hạn nghiêm trọng (> 14 ngày) -->
+        <div v-if="isOverdueSevere" class="alert alert-warning overdue-warning">
+          <i class="fas fa-exclamation-triangle"></i>
+          <strong>Sách quá hạn quá 14 ngày!</strong> Chỉ có thể xóa phiếu mượn này. Không thể trả sách hoặc báo mất.
+        </div>
+        
         <button
+          v-if="!isOverdueSevere"
           type="button"
           class="btn btn-success"
           @click="$emit('return:borrow')"
@@ -213,6 +220,7 @@
           <i class="fas fa-undo"></i> Trả sách
         </button>
         <button
+          v-if="!isOverdueSevere"
           type="button"
           class="btn btn-warning"
           @click="$emit('lost:borrow')"
@@ -299,16 +307,32 @@ export default {
     statusText() {
       if (this.borrowLocal.trangThai === "matSach") return "Mất sách";
       if (this.borrowLocal.trangThai === "daTra") return "Đã trả";
-      if (this.isOverdue) return "Quá hạn";
+      if (this.isOverdue) {
+        return `Quá hạn ${this.daysOverdue} ngày - Phạt: ${this.formatCurrency(this.lateFee)}`;
+      }
       return "Đang mượn";
     },
     isOverdue() {
       if (this.borrowLocal.trangThai !== "dangMuon") return false;
-      if (!this.borrowLocal.ngayMuon) return false;
-      const ngayMuon = new Date(this.borrowLocal.ngayMuon);
-      const hanTra = new Date(ngayMuon);
-      hanTra.setDate(hanTra.getDate() + 14);
+      if (!this.borrowLocal.hanTra) return false;
+      const hanTra = new Date(this.borrowLocal.hanTra);
       return new Date() > hanTra;
+    },
+    isOverdueSevere() {
+      if (!this.isOverdue) return false;
+      const hanTra = new Date(this.borrowLocal.hanTra);
+      const today = new Date();
+      const daysOverdue = Math.ceil((today - hanTra) / (1000 * 60 * 60 * 24));
+      return daysOverdue > 14;
+    },
+    daysOverdue() {
+      if (!this.isOverdue) return 0;
+      const hanTra = new Date(this.borrowLocal.hanTra);
+      const today = new Date();
+      return Math.ceil((today - hanTra) / (1000 * 60 * 60 * 24));
+    },
+    lateFee() {
+      return this.daysOverdue * 5000; // 5000đ/ngày
     },
   },
   watch: {
@@ -553,5 +577,26 @@ export default {
 .btn-danger:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(239, 71, 111, 0.4);
+}
+
+.overdue-warning {
+  width: 100%;
+  margin-bottom: 16px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+  border: 1px solid #ffc107;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #856404;
+}
+
+.overdue-warning i {
+  font-size: 1.2rem;
+}
+
+.overdue-warning strong {
+  font-weight: 600;
 }
 </style>

@@ -27,6 +27,7 @@ export default {
     },
     isOverdue(borrow) {
       if (borrow.trangThai !== "dangMuon") return false;
+      if (!borrow.hanTra) return false;
       const hanTra = new Date(borrow.hanTra);
       return new Date() > hanTra;
     },

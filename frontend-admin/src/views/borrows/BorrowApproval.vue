@@ -29,6 +29,14 @@
       </div>
       <div class="toolbar-right">
         <div class="action-buttons">
+          <button 
+            class="action-btn approve-all" 
+            @click="approveAllPending"
+            :disabled="pendingBorrows.length === 0 || isApprovingAll"
+          >
+            <i class="fas fa-check-double"></i>
+            {{ isApprovingAll ? 'Đang duyệt...' : 'Duyệt tất cả' }}
+          </button>
           <button class="action-btn refresh" @click="loadBorrows">
             <i class="fas fa-redo"></i>
             Làm mới
@@ -216,6 +224,7 @@ export default {
       approvedBorrows: [],
       searchText: "",
       isApproving: false,
+      isApprovingAll: false,
       isProcessing: false,
       showConfirm: false,
       confirmAction: null, // 'approve' or 'reject'
@@ -299,6 +308,53 @@ export default {
         );
       } finally {
         this.isProcessing = false;
+      }
+    },
+    async approveAllPending() {
+      if (this.pendingBorrows.length === 0) return;
+      
+      const confirmed = confirm(
+        `Bạn có chắc chắn muốn duyệt tất cả ${this.pendingBorrows.length} phiếu mượn đang chờ?`
+      );
+      
+      if (!confirmed) return;
+
+      this.isApprovingAll = true;
+      let successCount = 0;
+      let failCount = 0;
+
+      try {
+        // Duyệt tuần tự từng phiếu
+        for (const borrow of this.pendingBorrows) {
+          try {
+            await BorrowService.approve(borrow._id, {
+              note: "", // Ghi chú mặc định rỗng
+            });
+            successCount++;
+          } catch (error) {
+            console.error(`Error approving ${borrow._id}:`, error);
+            failCount++;
+          }
+        }
+
+        // Hiển thị kết quả
+        if (failCount === 0) {
+          this.$notify?.success?.(
+            `Đã duyệt thành công tất cả ${successCount} phiếu mượn`
+          );
+        } else {
+          this.$notify?.warning?.(
+            `Duyệt thành công ${successCount} phiếu, ${failCount} phiếu lỗi`
+          );
+        }
+
+        // Reload danh sách
+        await this.loadBorrows();
+      } catch (error) {
+        console.error("Error in approveAllPending:", error);
+        this.$notify?.error?.("Có lỗi xảy ra khi duyệt phiếu mượn");
+      } finally {
+        this.isApprovingAll = false;
       }
     },
     formatDate(date) {
@@ -421,9 +477,29 @@ export default {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.action-btn:hover {
+.action-btn:hover:not(:disabled) {
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.action-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.action-btn.approve-all {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  font-weight: 500;
+}
+
+.action-btn.approve-all:hover:not(:disabled) {
+  background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
+}
+
+.action-btn.refresh {
+  background: white;
+  color: #333;
 }
 
 .approval-container {
