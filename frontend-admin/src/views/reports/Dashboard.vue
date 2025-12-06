@@ -11,11 +11,19 @@
           <div class="row align-items-end">
             <div class="col-md-3">
               <label class="form-label">Từ ngày</label>
-              <input type="date" class="form-control" v-model="filters.startDate" />
+              <input
+                type="date"
+                class="form-control"
+                v-model="filters.startDate"
+              />
             </div>
             <div class="col-md-3">
               <label class="form-label">Đến ngày</label>
-              <input type="date" class="form-control" v-model="filters.endDate" />
+              <input
+                type="date"
+                class="form-control"
+                v-model="filters.endDate"
+              />
             </div>
             <div class="col-md-3">
               <label class="form-label">Chu kỳ biểu đồ</label>
@@ -101,8 +109,10 @@
           <div class="stat-card card text-center">
             <div class="card-body">
               <i class="fas fa-money-bill-wave stat-icon text-warning"></i>
-              <h3 class="stat-number">{{ formatCurrency(overview.tongTienPhat) }}</h3>
-              <p class="stat-label">Tổng tiền phạt</p>
+              <h3 class="stat-number">
+                {{ formatCurrency(overview.tongTienPhat) }}
+              </h3>
+              <p class="stat-label">Tổng tiền bồi thường</p>
             </div>
           </div>
         </div>
@@ -110,8 +120,10 @@
           <div class="stat-card card text-center">
             <div class="card-body">
               <i class="fas fa-dollar-sign stat-icon text-success"></i>
-              <h3 class="stat-number">{{ formatCurrency(revenue.tongDoanhThu) }}</h3>
-              <p class="stat-label">Tổng doanh thu</p>
+              <h3 class="stat-number">
+                {{ formatCurrency(revenue.tongDoanhThu) }}
+              </h3>
+              <p class="stat-label">Tổng tiền phạt</p>
             </div>
           </div>
         </div>
@@ -123,9 +135,7 @@
         <div class="col-md-8">
           <div class="card">
             <div class="card-header">
-              <h5>
-                <i class="fas fa-chart-line"></i> Xu hướng mượn sách
-              </h5>
+              <h5><i class="fas fa-chart-line"></i> Xu hướng mượn sách</h5>
             </div>
             <div class="card-body">
               <Line :data="borrowTrendData" :options="lineChartOptions" />
@@ -137,9 +147,7 @@
         <div class="col-md-4">
           <div class="card">
             <div class="card-header">
-              <h5>
-                <i class="fas fa-chart-pie"></i> Phân bố theo thể loại
-              </h5>
+              <h5><i class="fas fa-chart-pie"></i> Phân bố theo thể loại</h5>
             </div>
             <div class="card-body">
               <Pie :data="categoryData" :options="pieChartOptions" />
@@ -177,7 +185,9 @@
                       <td>{{ book.tenSach }}</td>
                       <td>{{ book.tacGia }}</td>
                       <td>
-                        <span class="badge bg-primary">{{ book.soLuotMuon }}</span>
+                        <span class="badge bg-primary">{{
+                          book.soLuotMuon
+                        }}</span>
                       </td>
                       <td>{{ book.soQuyen }}</td>
                     </tr>
@@ -194,9 +204,7 @@
         <div class="col-md-12">
           <div class="card">
             <div class="card-header">
-              <h5>
-                <i class="fas fa-star"></i> Top 10 độc giả tích cực
-              </h5>
+              <h5><i class="fas fa-star"></i> Top 10 độc giả tích cực</h5>
             </div>
             <div class="card-body">
               <div class="table-responsive">
@@ -218,7 +226,9 @@
                       <td>{{ reader.hoLot }} {{ reader.ten }}</td>
                       <td>{{ reader.dienThoai }}</td>
                       <td>
-                        <span class="badge bg-success">{{ reader.soLuotMuon }}</span>
+                        <span class="badge bg-success">{{
+                          reader.soLuotMuon
+                        }}</span>
                       </td>
                       <td>{{ formatCurrency(reader.tongTienPhat) }} VNĐ</td>
                     </tr>
@@ -237,11 +247,16 @@
           <div class="card">
             <div class="card-header">
               <h5>
-                <i class="fas fa-clock"></i> Sách quá hạn ({{ overdueAndLost.overdue.length }})
+                <i class="fas fa-clock"></i> Sách quá hạn ({{
+                  overdueAndLost.overdue.length
+                }})
               </h5>
             </div>
             <div class="card-body">
-              <div class="table-responsive" style="max-height: 400px; overflow-y: auto">
+              <div
+                class="table-responsive"
+                style="max-height: 400px; overflow-y: auto"
+              >
                 <table class="table table-sm table-hover">
                   <thead>
                     <tr>
@@ -255,11 +270,11 @@
                     <tr v-for="item in overdueAndLost.overdue" :key="item._id">
                       <td>{{ item.maMuon }}</td>
                       <td>{{ item.book?.tenSach || "N/A" }}</td>
+                      <td>{{ item.reader?.hoLot }} {{ item.reader?.ten }}</td>
                       <td>
-                        {{ item.reader?.hoLot }} {{ item.reader?.ten }}
-                      </td>
-                      <td>
-                        <span class="badge bg-danger">{{ item.soNgayQuaHan }} ngày</span>
+                        <span class="badge bg-danger"
+                          >{{ item.soNgayQuaHan }} ngày</span
+                        >
                       </td>
                     </tr>
                   </tbody>
@@ -274,11 +289,16 @@
           <div class="card">
             <div class="card-header">
               <h5>
-                <i class="fas fa-ban"></i> Sách mất ({{ overdueAndLost.lost.length }})
+                <i class="fas fa-ban"></i> Sách mất ({{
+                  overdueAndLost.lost.length
+                }})
               </h5>
             </div>
             <div class="card-body">
-              <div class="table-responsive" style="max-height: 400px; overflow-y: auto">
+              <div
+                class="table-responsive"
+                style="max-height: 400px; overflow-y: auto"
+              >
                 <table class="table table-sm table-hover">
                   <thead>
                     <tr>
@@ -292,9 +312,7 @@
                     <tr v-for="item in overdueAndLost.lost" :key="item._id">
                       <td>{{ item.maMuon }}</td>
                       <td>{{ item.book?.tenSach || "N/A" }}</td>
-                      <td>
-                        {{ item.reader?.hoLot }} {{ item.reader?.ten }}
-                      </td>
+                      <td>{{ item.reader?.hoLot }} {{ item.reader?.ten }}</td>
                       <td>{{ formatDate(item.ngayMuon) }}</td>
                     </tr>
                   </tbody>
@@ -440,9 +458,7 @@ export default {
         topCategories.push({ _id: "Khác", soLuong: otherCount });
       }
 
-      const labels = topCategories.map(
-        (item) => item._id || "Chưa phân loại"
-      );
+      const labels = topCategories.map((item) => item._id || "Chưa phân loại");
       const data = topCategories.map((item) => item.soLuong);
 
       return {
